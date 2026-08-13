@@ -32,7 +32,7 @@ const BRAND_COLOURS = [
   { name: "Land Rover", primary: "#0b6836", dark: "#073d1f", black: "#0a0a0a" },
   { name: "LDV", primary: "#e2231a", dark: "#a91a13", black: "#0a0a0a" },
   { name: "Lexus", primary: "#1a1a1a", dark: "#000000", black: "#0a0a0a" },
-  { name: "Mazda", primary: "#ed1c24", dark: "#b50014", black: "#050505" },
+  { name: "Mazda", primary: "#8b1d24", dark: "#5e1319", black: "#050505" }, // deep "Soul Red" tone - Mazda's actual corporate logo is black/white/silver, no single official web-red hex exists
   { name: "Mercedes-Benz", primary: "#000000", dark: "#1c1c1c", black: "#0a0a0a" },
   { name: "MG", primary: "#ff0000", dark: "#b30000", black: "#0a0a0a" },
   { name: "Mitsubishi", primary: "#e60012", dark: "#a8000d", black: "#0a0a0a" },

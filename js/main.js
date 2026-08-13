@@ -38,8 +38,6 @@ brandSelect.value = "Mazda";
 function applyBrandColours() {
   const b = findBrandColours(brandSelect.value);
   document.getElementById("colourPrimary").value = b.primary;
-  document.getElementById("colourDark").value = b.dark;
-  document.getElementById("colourBlack").value = b.black;
   scheduleUpdate();
 }
 brandSelect.addEventListener("change", applyBrandColours);
@@ -212,14 +210,22 @@ function checked(id) {
 function collectLandingState() {
   const brandName = val("brandName") || val("dealershipName") || "Custom";
   const prefix = slugify(brandName);
+  const primaryColour = val("colourPrimary");
   return {
     brandName,
+    // One accent colour is all the user sets - the hover/dark shade is
+    // derived automatically (darkened toward black) rather than asking for
+    // a second colour pick. "black" is a fixed unused-in-Slick constant;
+    // kept only because generateCSS's Bold path (currently unexposed in the
+    // UI, kept for a possible future premium tier) still reads it.
     colours: {
-      primary: val("colourPrimary"),
-      dark: val("colourDark"),
-      black: val("colourBlack"),
+      primary: primaryColour,
+      dark: mixHex(primaryColour, { r: 0, g: 0, b: 0 }, 0.35),
+      black: "#0a0a0a",
     },
-    style: document.querySelector('input[name="style"]:checked').value,
+    // Bold is kept in templates.js for a possible future premium tier but
+    // not exposed in the wizard - Slick is the only style on offer for now.
+    style: "slick",
     urgencyEnabled: checked("urgencyEnabled"),
     urgencyText: val("urgencyText"),
     heroBrandLine: val("heroBrandLine"),
