@@ -355,6 +355,22 @@ function slugifyFieldName(str, fallback) {
   return s || fallback;
 }
 
+function addOptionRow(list) {
+  const optRow = document.createElement("div");
+  optRow.className = "f-option-row";
+  optRow.innerHTML = `
+    <input type="text" class="f-option" placeholder="e.g. Sedan">
+    <button type="button" class="remove-btn">Remove</button>
+  `;
+  list.appendChild(optRow);
+  optRow.querySelector(".remove-btn").addEventListener("click", () => {
+    optRow.remove();
+    scheduleFormUpdate();
+  });
+  wireLiveInputs(optRow);
+  return optRow;
+}
+
 function addQuickField(kind) {
   const cfg = QUICK_FIELDS[kind];
   const row = document.createElement("div");
@@ -364,7 +380,9 @@ function addQuickField(kind) {
 
   const typeLabel = { text: "Full Name", email: "Email", tel: "Mobile", textarea: "Message", select: "Dropdown" }[cfg.type];
   const optionsBlock = cfg.type === "select"
-    ? `<label>Dropdown options (one per line) <textarea class="f-options" rows="3"></textarea></label>`
+    ? `<label>Dropdown options</label>
+       <div class="f-options-list"></div>
+       <button type="button" class="add-btn f-add-option">+ Add option</button>`
     : "";
 
   row.innerHTML = `
@@ -377,6 +395,16 @@ function addQuickField(kind) {
     <label class="checkbox"><input type="checkbox" class="f-required" ${cfg.required ? "checked" : ""}> Required</label>
   `;
   formFieldsList.appendChild(row);
+
+  if (cfg.type === "select") {
+    const optionsList = row.querySelector(".f-options-list");
+    addOptionRow(optionsList);
+    addOptionRow(optionsList);
+    row.querySelector(".f-add-option").addEventListener("click", () => {
+      addOptionRow(optionsList);
+      scheduleFormUpdate();
+    });
+  }
 
   row.querySelector(".remove-btn").addEventListener("click", () => {
     row.remove();
@@ -407,16 +435,15 @@ function collectFormFields() {
     let n = 2;
     while (used.has(unique)) { unique = `${name}-${n}`; n++; }
     used.add(unique);
-    const optionsField = row.querySelector(".f-options");
     return {
       name: unique,
       id: unique,
       label,
       type,
       required: row.querySelector(".f-required").checked,
-      options: optionsField
-        ? optionsField.value.split("\n").map((s) => s.trim()).filter(Boolean)
-        : [],
+      options: [...row.querySelectorAll(".f-option")]
+        .map((el) => el.value.trim())
+        .filter(Boolean),
     };
   });
 }

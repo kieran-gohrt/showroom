@@ -324,6 +324,18 @@ button { cursor: pointer; font-family: inherit; }
 .quick-add-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 .quick-add-btn:disabled:hover { border-color: var(--border-strong); background: transparent; }
 
+.f-options-list { margin-bottom: 8px; }
+
+.f-option-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.f-option-row .f-option { margin-top: 0; }
+.f-option-row .remove-btn { flex: 0 0 auto; }
+
 .preview-col {
     display: flex;
     flex-direction: column;
