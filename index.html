@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdTorque Landing Page Generator</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<header class="app-header">
+    <h1>AdTorque Landing Page Generator</h1>
+    <nav class="tabs">
+        <button class="tab-btn active" data-tab="landing">Landing Page</button>
+        <button class="tab-btn" data-tab="form">Contact Form</button>
+    </nav>
+</header>
+
+<main>
+
+<!-- ============ LANDING PAGE TAB ============ -->
+<section id="panel-landing" class="tab-panel active app-grid">
+    <div class="form-col">
+
+        <fieldset>
+            <legend>Dealership</legend>
+            <label>Website URL
+                <input type="text" id="websiteUrl" placeholder="https://www.dealership.com.au">
+            </label>
+            <label>Brand
+                <select id="brandName"></select>
+            </label>
+            <label>Dealership name
+                <input type="text" id="dealershipName" placeholder="Essendon Mazda">
+            </label>
+            <label>Suburb / location
+                <input type="text" id="suburb" placeholder="Essendon">
+            </label>
+            <div class="colour-row">
+                <label>Primary <input type="color" id="colourPrimary"></label>
+                <label>Hover/dark <input type="color" id="colourDark"></label>
+                <label>Base/black <input type="color" id="colourBlack"></label>
+            </div>
+            <p class="hint">Brand colours are best-effort — check the preview and adjust before shipping.</p>
+        </fieldset>
+
+        <fieldset>
+            <legend>Style</legend>
+            <label class="radio"><input type="radio" name="style" value="bold" checked> Bold — dark background, big type, high contrast</label>
+            <label class="radio"><input type="radio" name="style" value="slick"> Slick — white background, brand accents only, minimal</label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Hero</legend>
+            <label>Event pill text
+                <input type="text" id="eventPill" value="EOFY Sale Now On">
+            </label>
+            <label class="checkbox"><input type="checkbox" id="urgencyEnabled"> Urgency badge</label>
+            <label>Urgency badge text
+                <input type="text" id="urgencyText" value="5 Days Left" disabled>
+            </label>
+            <label>Brand line (small text above heading)
+                <input type="text" id="heroBrandLine" value="End of Financial Year">
+            </label>
+            <label>Heading
+                <input type="text" id="heading" value="Massive Savings">
+            </label>
+            <label>Subheading
+                <input type="text" id="subheading" value="On Now">
+            </label>
+            <label>Paragraph
+                <textarea id="paragraph">Don't miss your chance to save big before EOFY ends.</textarea>
+            </label>
+            <label class="checkbox"><input type="checkbox" id="dateBannerEnabled" checked> Date banner</label>
+            <label>Date banner text
+                <input type="text" id="dateBannerText" value="Ends 30 June">
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Call to action</legend>
+            <label>Primary button text
+                <input type="text" id="ctaPrimaryText" value="Enquire Now">
+            </label>
+            <label>Primary button link
+                <input type="text" id="ctaPrimaryHref" value="#enquire">
+            </label>
+            <label class="checkbox"><input type="checkbox" id="ctaSecondaryEnabled"> Secondary button</label>
+            <label>Secondary button text
+                <input type="text" id="ctaSecondaryText" value="Browse Stock" disabled>
+            </label>
+            <label>Secondary button link
+                <input type="text" id="ctaSecondaryHref" value="/stock" disabled>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Offers</legend>
+            <label>Panel heading
+                <input type="text" id="offerHeading" value="Why Buy Now">
+            </label>
+            <label>Panel intro
+                <textarea id="offerIntro">Take advantage of these limited-time offers before they're gone.</textarea>
+            </label>
+            <div id="offersList"></div>
+            <p class="hint">3–6 offer cards. Untick to drop below 6.</p>
+            <label class="checkbox"><input type="checkbox" id="financeEnabled"> Finance teaser box</label>
+            <label>Finance headline
+                <input type="text" id="financeHeadline" value="From $99/week" disabled>
+            </label>
+            <label>Finance text
+                <input type="text" id="financeText" value="Speak to our finance team for a tailored quote." disabled>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Stock slider</legend>
+            <label class="checkbox"><input type="checkbox" id="stockEnabled" checked> Include stock section</label>
+            <div id="stockRows"></div>
+            <label class="checkbox"><input type="checkbox" id="stockRow2Enabled"> Add a second stock section</label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Closing panel</legend>
+            <label class="checkbox"><input type="checkbox" id="endingEnabled" checked> Include closing panel</label>
+            <label>Heading
+                <input type="text" id="endingHeading" value="Don't Miss Out">
+            </label>
+            <label>Text
+                <textarea id="endingText">Offer ends soon — enquire today to secure your vehicle.</textarea>
+            </label>
+        </fieldset>
+
+        <fieldset>
+            <legend>Terms &amp; conditions</legend>
+            <label class="checkbox"><input type="checkbox" id="tcsEnabled" checked> Include T&amp;Cs</label>
+            <label>Heading
+                <input type="text" id="tcsHeading" value="Terms & Conditions">
+            </label>
+            <label>Items (one per line)
+                <textarea id="tcsItems" rows="4">Offer valid while stocks last.
+Excludes fleet and government sales.
+Not available in conjunction with any other offer.</textarea>
+            </label>
+            <label class="checkbox"><input type="checkbox" id="tcsAccordion"> Show as collapsible accordion</label>
+        </fieldset>
+
+    </div>
+
+    <div class="preview-col">
+        <div class="preview-frame-wrap">
+            <iframe id="previewFrame" title="Live preview"></iframe>
+        </div>
+        <div class="code-output">
+            <div class="code-toolbar">
+                <span>Generated code</span>
+                <button id="copyLandingCode">Copy code</button>
+            </div>
+            <textarea id="landingCodeOutput" readonly></textarea>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CONTACT FORM TAB ============ -->
+<section id="panel-form" class="tab-panel app-grid">
+    <div class="form-col">
+        <fieldset>
+            <legend>Fields</legend>
+            <div id="formFieldsList"></div>
+            <button id="addFieldBtn" type="button">+ Add field</button>
+        </fieldset>
+        <fieldset>
+            <legend>Options</legend>
+            <label>Submit button label
+                <input type="text" id="submitLabel" value="Submit Enquiry">
+            </label>
+            <label class="checkbox"><input type="checkbox" id="departmentEnabled"> Hidden department field</label>
+            <label>Department value
+                <input type="text" id="departmentValue" value="Sales" disabled>
+            </label>
+        </fieldset>
+    </div>
+    <div class="preview-col">
+        <div class="code-output">
+            <div class="code-toolbar">
+                <span>Website Form HTML</span>
+                <button id="copyFormCode">Copy code</button>
+            </div>
+            <textarea id="formCodeOutput" readonly rows="14"></textarea>
+        </div>
+        <div class="code-output">
+            <div class="code-toolbar">
+                <span>Email Template HTML</span>
+                <button id="copyEmailCode">Copy code</button>
+            </div>
+            <textarea id="emailCodeOutput" readonly rows="14"></textarea>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<script src="js/brands.js"></script>
+<script src="js/templates.js"></script>
+<script src="js/formgen.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
