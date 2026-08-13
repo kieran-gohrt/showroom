@@ -760,6 +760,71 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+function hexToRgb(hex) {
+  const h = hex.replace("#", "");
+  const full = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  return {
+    r: parseInt(full.substring(0, 2), 16),
+    g: parseInt(full.substring(2, 4), 16),
+    b: parseInt(full.substring(4, 6), 16),
+  };
+}
+
+function rgbToHex(r, g, b) {
+  const c = (n) => Math.round(Math.min(255, Math.max(0, n))).toString(16).padStart(2, "0");
+  return `#${c(r)}${c(g)}${c(b)}`;
+}
+
+// True WCAG relative luminance (0 black - 1 white), gamma-corrected — unlike
+// a simple weighted-brightness average, this doesn't unfairly flag saturated
+// colours (e.g. a pure red reads as "dark" under naive weighting despite
+// having decent real contrast against black).
+function relativeLuminance(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const chan = (v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  };
+  return 0.2126 * chan(r) + 0.7152 * chan(g) + 0.0722 * chan(b);
+}
+
+function contrastRatio(hexA, hexB) {
+  const lA = relativeLuminance(hexA);
+  const lB = relativeLuminance(hexB);
+  const lighter = Math.max(lA, lB);
+  const darker = Math.min(lA, lB);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+function mixHex(hex, targetRgb, amount) {
+  const { r, g, b } = hexToRgb(hex);
+  return rgbToHex(
+    r + (targetRgb.r - r) * amount,
+    g + (targetRgb.g - g) * amount,
+    b + (targetRgb.b - b) * amount
+  );
+}
+
+// A brand's accent colour is used directly as small text/border on a dark
+// (bold) or light (slick) background. If the colour itself doesn't have
+// enough real contrast against that background it becomes unreadable —
+// this happens for any muted/near-black or near-white brand colour, not
+// just one brand. Nudge it toward white/black just enough to clear a
+// minimum contrast ratio, leaving already-legible colours (saturated reds,
+// blues, etc.) untouched. The true brand colour is kept everywhere else
+// (buttons, fills) where it sits under white text instead.
+function accentTextColour(hex, style) {
+  const bg = style === "bold" ? "#0a0a0a" : "#ffffff";
+  const toward = style === "bold" ? { r: 255, g: 255, b: 255 } : { r: 0, g: 0, b: 0 };
+  let result = hex;
+  let amount = 0;
+  while (contrastRatio(result, bg) < 3.2 && amount < 0.9) {
+    amount += 0.12;
+    result = mixHex(hex, toward, amount);
+  }
+  return result;
+}
+
 // Real production syntax confirmed live on AdTorque Edge sites:
 // data-query="condition=New,Demo&make[Isuzu]=D-MAX"                  (filter by condition/model)
 // data-query="make[Isuzu]=&keywords=31027237,31421545,31421614"      (manual stock number list)
@@ -840,10 +905,14 @@ function getThemeTokens(style, colours) {
 function generateCSS(prefix, colours, style) {
   const t = getThemeTokens(style, colours);
   const isBold = style === "bold";
+  // Guaranteed-legible version of the brand colour for small text/borders
+  // sitting directly on the page background (see accentTextColour above).
+  const accentText = accentTextColour(colours.primary, style);
   return `<style>
     :root {
         --${prefix}-primary: ${colours.primary};
         --${prefix}-primary-dark: ${colours.dark};
+        --${prefix}-accent-text: ${accentText};
         --${prefix}-black: ${colours.black};
         --${prefix}-white: #ffffff;
         --${prefix}-grey: ${isBold ? "#d8d8d8" : "#5a5a5a"};
@@ -900,7 +969,7 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-hero-brand {
         margin: 0 0 6px;
-        color: var(--${prefix}-primary) !important;
+        color: var(--${prefix}-accent-text) !important;
         font-size: clamp(12px, 1.1vw, 15px);
         line-height: 1.2;
         font-weight: 800;
@@ -948,7 +1017,7 @@ function generateCSS(prefix, colours, style) {
         padding: 7px 16px;
         margin: 0 auto 22px;
         background: ${hexToRgba(colours.primary, isBold ? 0.16 : 0.08)};
-        color: var(--${prefix}-primary) !important;
+        color: var(--${prefix}-accent-text) !important;
         font-size: clamp(11px, 1vw, 13px);
         line-height: 1.2;
         font-weight: 800;
@@ -957,7 +1026,7 @@ function generateCSS(prefix, colours, style) {
         ${t.dateBannerTransform}
         ${t.dateBannerClip}
         ${t.dateBannerRadius}
-        border: 1px solid ${hexToRgba(colours.primary, 0.4)};
+        border: 1px solid ${hexToRgba(accentText, 0.5)};
     }
 
     .${prefix}-cta-row {
@@ -1091,14 +1160,14 @@ function generateCSS(prefix, colours, style) {
         margin: 18px auto 0;
         padding: 18px 20px;
         border-radius: 14px;
-        border: 1px dashed var(--${prefix}-primary);
+        border: 1px dashed var(--${prefix}-accent-text);
         background: ${isBold ? hexToRgba(colours.primary, 0.08) : hexToRgba(colours.primary, 0.05)};
         text-align: center;
     }
 
     .${prefix}-finance-teaser strong {
         display: block;
-        color: var(--${prefix}-primary) !important;
+        color: var(--${prefix}-accent-text) !important;
         font-size: 18px;
         font-weight: 800;
         margin-bottom: 4px;

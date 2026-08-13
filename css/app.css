@@ -1,19 +1,19 @@
 :root {
-    --bg: #ffffff;
-    --surface: #f7f7f8;
-    --surface-input: #ffffff;
-    --border: #e3e3e6;
-    --border-strong: #cfcfd4;
-    --text: #17171a;
-    --text-muted: #6b6b72;
-    --text-faint: #a3a3ab;
-    --accent: #2f5bff;
-    --accent-hover: #2447d1;
-    --accent-soft: #eef1ff;
-    --danger: #dc2626;
+    --bg: #0B0B0B;
+    --surface: #111111;
+    --surface-input: #161616;
+    --border: rgba(255,255,255,0.10);
+    --border-strong: rgba(255,255,255,0.18);
+    --text: #F2F1EE;
+    --text-muted: rgba(242,241,238,0.55);
+    --text-faint: rgba(242,241,238,0.35);
+    --accent: #FFC72C;
+    --accent-hover: #FFD558;
+    --accent-soft: rgba(255,199,44,0.12);
+    --danger: #ff6b6b;
     --radius: 10px;
     --radius-lg: 14px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -39,12 +39,13 @@ body {
     z-index: 10;
 }
 
-.app-header h1 {
-    font-size: 14px;
-    margin: 0;
-    font-weight: 600;
-    color: var(--text);
-    letter-spacing: -0.01em;
+.brand-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    line-height: 1;
 }
 
 .tabs {
@@ -74,7 +75,7 @@ body {
     background: var(--bg);
     color: var(--text);
     font-weight: 600;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.06), 0 0 0 1px var(--border);
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 0 1px var(--border);
 }
 
 .tab-panel { display: none; }
@@ -83,7 +84,7 @@ body {
 .app-grid {
     grid-template-columns: 380px 1fr;
     gap: 0;
-    height: calc(100vh - 49px);
+    height: calc(100vh - 49px - 40px);
 }
 
 .form-col {
@@ -110,7 +111,7 @@ body {
 .generate-btn {
     width: 100%;
     background: var(--accent);
-    color: #ffffff;
+    color: #0B0B0B;
     border: none;
     border-radius: var(--radius);
     padding: 12px;
@@ -118,7 +119,7 @@ body {
     font-size: 14px;
     cursor: pointer;
     transition: background 0.15s ease;
-    box-shadow: 0 1px 2px rgba(47,91,255,0.25);
+    box-shadow: 0 1px 2px rgba(255,199,44,0.2);
 }
 
 .generate-btn:hover { background: var(--accent-hover); }
@@ -342,7 +343,7 @@ button { cursor: pointer; font-family: inherit; }
     border-radius: var(--radius-lg);
     overflow: hidden;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 #previewFrame {
@@ -372,8 +373,8 @@ button { cursor: pointer; font-family: inherit; }
 }
 
 .code-toolbar button {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
+    background: rgba(255,199,44,0.14);
+    color: var(--accent);
     border: none;
     border-radius: 6px;
     padding: 4px 10px;
@@ -382,7 +383,7 @@ button { cursor: pointer; font-family: inherit; }
     transition: background 0.15s ease;
 }
 
-.code-toolbar button:hover { background: rgba(255,255,255,0.18); }
+.code-toolbar button:hover { background: rgba(255,199,44,0.24); }
 
 .code-output textarea {
     width: 100%;
@@ -394,6 +395,24 @@ button { cursor: pointer; font-family: inherit; }
     font-family: "SF Mono", Menlo, monospace;
     font-size: 12px;
     padding: 14px;
+}
+
+.app-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    border-top: 1px solid var(--border);
+    background: #0E0E0E;
+}
+
+.app-footer span {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-faint);
 }
 
 @media (max-width: 900px) {
