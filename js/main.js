@@ -335,86 +335,104 @@ function copyToClipboard(textareaId) {
 }
 
 // ---------- Contact form tab ----------
+// No raw "field name" is ever shown to the user - it's a technical HTML
+// attribute (the form's `name=` + the email template's `{placeholder}`),
+// not something a marketing manager needs to think about. Fixed fields get
+// a conventional name (name/email/phone); Dropdown/Message names are
+// derived from whatever label the user types, at generation time.
 const formFieldsList = document.getElementById("formFieldsList");
 
-function addFieldRow(defaults = {}) {
+const QUICK_FIELDS = {
+  name: { type: "text", label: "Full Name", fixedName: "name", required: true, single: true },
+  email: { type: "email", label: "Email", fixedName: "email", required: true, single: true },
+  phone: { type: "tel", label: "Mobile", fixedName: "phone", required: true, single: true },
+  message: { type: "textarea", label: "Message", fixedName: null, required: false, single: false },
+  select: { type: "select", label: "", fixedName: null, required: false, single: false },
+};
+
+function slugifyFieldName(str, fallback) {
+  const s = (str || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  return s || fallback;
+}
+
+function addQuickField(kind) {
+  const cfg = QUICK_FIELDS[kind];
   const row = document.createElement("div");
   row.className = "field-row";
-  const name = defaults.name || "";
+  row.dataset.fieldType = cfg.type;
+  if (cfg.fixedName) row.dataset.fixedName = cfg.fixedName;
+
+  const typeLabel = { text: "Full Name", email: "Email", tel: "Mobile", textarea: "Message", select: "Dropdown" }[cfg.type];
+  const optionsBlock = cfg.type === "select"
+    ? `<label>Dropdown options (one per line) <textarea class="f-options" rows="3"></textarea></label>`
+    : "";
+
   row.innerHTML = `
     <div class="field-row-head">
-      <strong>Field</strong>
+      <strong>${typeLabel}</strong>
       <button type="button" class="remove-btn">Remove</button>
     </div>
-    <label>Field name (used as form 'name' + email placeholder)
-      <input type="text" class="f-name" value="${name}">
-    </label>
-    <label>Label
-      <input type="text" class="f-label" value="${defaults.label || ""}">
-    </label>
-    <label>Type
-      <select class="f-type">
-        <option value="text" ${defaults.type === "text" ? "selected" : ""}>Text</option>
-        <option value="email" ${defaults.type === "email" ? "selected" : ""}>Email</option>
-        <option value="tel" ${defaults.type === "tel" ? "selected" : ""}>Phone</option>
-        <option value="select" ${defaults.type === "select" ? "selected" : ""}>Dropdown</option>
-        <option value="textarea" ${defaults.type === "textarea" ? "selected" : ""}>Message / textarea</option>
-      </select>
-    </label>
-    <label class="f-options-wrap" style="display:${defaults.type === "select" ? "block" : "none"}">Dropdown options (one per line)
-      <textarea class="f-options" rows="3">${(defaults.options || []).join("\n")}</textarea>
-    </label>
-    <label class="checkbox"><input type="checkbox" class="f-required" ${defaults.required ? "checked" : ""}> Required</label>
+    <label>Label <input type="text" class="f-label" value="${escapeHtml(cfg.label)}" placeholder="${cfg.type === "select" ? "e.g. Vehicle Interested In" : ""}"></label>
+    ${optionsBlock}
+    <label class="checkbox"><input type="checkbox" class="f-required" ${cfg.required ? "checked" : ""}> Required</label>
   `;
   formFieldsList.appendChild(row);
 
-  const typeSelect = row.querySelector(".f-type");
-  const optionsWrap = row.querySelector(".f-options-wrap");
-  typeSelect.addEventListener("change", () => {
-    optionsWrap.style.display = typeSelect.value === "select" ? "block" : "none";
-    scheduleFormUpdate();
-  });
   row.querySelector(".remove-btn").addEventListener("click", () => {
     row.remove();
+    if (cfg.single) document.querySelector(`.quick-add-btn[data-quick="${kind}"]`).disabled = false;
     scheduleFormUpdate();
   });
   wireLiveInputs(row);
+
+  if (cfg.single) document.querySelector(`.quick-add-btn[data-quick="${kind}"]`).disabled = true;
 }
 
-[
-  { name: "name", label: "Full Name", type: "text", required: true },
-  { name: "email", label: "Email", type: "email", required: true },
-  { name: "phone", label: "Mobile", type: "tel", required: true },
-].forEach((f) => addFieldRow(f));
+document.querySelectorAll(".quick-add-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    addQuickField(btn.dataset.quick);
+    scheduleFormUpdate();
+  });
+});
 
-document.getElementById("addFieldBtn").addEventListener("click", () => addFieldRow());
+["name", "email", "phone"].forEach((k) => addQuickField(k));
 
 function collectFormFields() {
-  return [...formFieldsList.querySelectorAll(".field-row")].map((row) => {
-    const name = row.querySelector(".f-name").value.trim();
-    const type = row.querySelector(".f-type").value;
+  const used = new Set();
+  return [...formFieldsList.querySelectorAll(".field-row")].map((row, i) => {
+    const type = row.dataset.fieldType;
+    const label = row.querySelector(".f-label").value.trim();
+    let name = row.dataset.fixedName || slugifyFieldName(label, `${type}-${i + 1}`);
+    let unique = name;
+    let n = 2;
+    while (used.has(unique)) { unique = `${name}-${n}`; n++; }
+    used.add(unique);
+    const optionsField = row.querySelector(".f-options");
     return {
-      name,
-      id: name,
-      label: row.querySelector(".f-label").value.trim(),
+      name: unique,
+      id: unique,
+      label,
       type,
       required: row.querySelector(".f-required").checked,
-      options: row
-        .querySelector(".f-options")
-        .value.split("\n")
-        .map((s) => s.trim())
-        .filter(Boolean),
+      options: optionsField
+        ? optionsField.value.split("\n").map((s) => s.trim()).filter(Boolean)
+        : [],
     };
   });
 }
 
+let hasFormGenerated = false;
+const formPreviewPlaceholder = document.getElementById("formPreviewPlaceholder");
+const formPreviewContent = document.getElementById("formPreviewContent");
+
 function scheduleFormUpdate() {
+  if (!hasFormGenerated) return;
   clearTimeout(scheduleFormUpdate._t);
   scheduleFormUpdate._t = setTimeout(updateFormOutputs, 200);
 }
 
 function updateFormOutputs() {
-  const fields = collectFormFields().filter((f) => f.name);
+  const fields = collectFormFields().filter((f) => f.label);
   const opts = {
     submitLabel: val("submitLabel"),
     departmentEnabled: checked("departmentEnabled"),
@@ -424,10 +442,16 @@ function updateFormOutputs() {
   document.getElementById("emailCodeOutput").value = generateEmailHTML(fields, opts);
 }
 
+document.getElementById("generateFormBtn").addEventListener("click", () => {
+  hasFormGenerated = true;
+  formPreviewPlaceholder.hidden = true;
+  formPreviewContent.hidden = false;
+  updateFormOutputs();
+});
+
 wireLiveInputs(document.getElementById("panel-form"));
 document.getElementById("copyFormCode").addEventListener("click", () => copyToClipboard("formCodeOutput"));
 document.getElementById("copyEmailCode").addEventListener("click", () => copyToClipboard("emailCodeOutput"));
 
 // ---------- Init ----------
 applyBrandColours();
-updateFormOutputs();

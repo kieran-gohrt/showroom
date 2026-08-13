@@ -248,7 +248,13 @@
             <summary>Fields</summary>
             <div class="section-body">
                 <div id="formFieldsList"></div>
-                <button id="addFieldBtn" type="button" class="add-btn">+ Add field</button>
+                <div class="quick-add-row">
+                    <button type="button" class="quick-add-btn" data-quick="name">+ Full Name</button>
+                    <button type="button" class="quick-add-btn" data-quick="email">+ Email</button>
+                    <button type="button" class="quick-add-btn" data-quick="phone">+ Mobile</button>
+                    <button type="button" class="quick-add-btn" data-quick="select">+ Dropdown</button>
+                    <button type="button" class="quick-add-btn" data-quick="message">+ Message</button>
+                </div>
             </div>
         </details>
         <details class="section" open>
@@ -266,21 +272,30 @@
             </div>
         </details>
         </div>
+
+        <div class="generate-bar">
+            <button id="generateFormBtn" class="generate-btn">Generate form code</button>
+        </div>
     </div>
     <div class="preview-col">
-        <div class="code-output">
-            <div class="code-toolbar">
-                <span>Website Form HTML</span>
-                <button id="copyFormCode">Copy code</button>
-            </div>
-            <textarea id="formCodeOutput" readonly rows="14"></textarea>
+        <div id="formPreviewPlaceholder" class="preview-placeholder">
+            <p>Add your fields on the left, then hit <strong>Generate form code</strong> to see it here.</p>
         </div>
-        <div class="code-output">
-            <div class="code-toolbar">
-                <span>Email Template HTML</span>
-                <button id="copyEmailCode">Copy code</button>
+        <div id="formPreviewContent" class="preview-content" hidden>
+            <div class="code-output">
+                <div class="code-toolbar">
+                    <span>Website Form HTML</span>
+                    <button id="copyFormCode">Copy code</button>
+                </div>
+                <textarea id="formCodeOutput" readonly rows="14"></textarea>
             </div>
-            <textarea id="emailCodeOutput" readonly rows="14"></textarea>
+            <div class="code-output">
+                <div class="code-toolbar">
+                    <span>Email Template HTML</span>
+                    <button id="copyEmailCode">Copy code</button>
+                </div>
+                <textarea id="emailCodeOutput" readonly rows="14"></textarea>
+            </div>
         </div>
     </div>
 </section>

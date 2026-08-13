@@ -302,6 +302,28 @@ button { cursor: pointer; font-family: inherit; }
 .add-btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .add-btn:disabled:hover { border-color: var(--border-strong); background: transparent; }
 
+.quick-add-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.quick-add-btn {
+    background: transparent;
+    color: var(--accent);
+    border: 1px dashed var(--border-strong);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 600;
+    font-size: 12px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.quick-add-btn:hover { border-color: var(--accent); background: var(--accent-soft); }
+.quick-add-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.quick-add-btn:disabled:hover { border-color: var(--border-strong); background: transparent; }
+
 .preview-col {
     display: flex;
     flex-direction: column;
