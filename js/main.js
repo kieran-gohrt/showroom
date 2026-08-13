@@ -83,13 +83,28 @@ addOfferBtn.addEventListener("click", () => {
   scheduleUpdate();
 });
 
-// ---------- Stock rows ----------
+// ---------- Stock rows (dynamic add/remove, up to 10) ----------
 const stockRowsWrap = document.getElementById("stockRows");
-function buildStockRow(index) {
+const addStockBtn = document.getElementById("addStockBtn");
+const STOCK_MAX = 10;
+
+function renumberStockRows() {
+  const rows = stockRowsWrap.querySelectorAll(".stock-row");
+  rows.forEach((row, i) => {
+    row.querySelector(".stock-row-head span").textContent = `Slider ${i + 1}`;
+    row.querySelector(".remove-btn").disabled = rows.length <= 1;
+  });
+  addStockBtn.disabled = rows.length >= STOCK_MAX;
+}
+
+function buildStockRow() {
   const row = document.createElement("div");
   row.className = "stock-row";
-  row.dataset.row = index;
   row.innerHTML = `
+    <div class="stock-row-head field-row-head">
+      <span>Slider</span>
+      <button type="button" class="remove-btn">Remove</button>
+    </div>
     <label>Section heading <input type="text" class="stock-heading" placeholder="e.g. New Arrivals"></label>
     <label>Intro text <input type="text" class="stock-intro" placeholder="e.g. Explore our latest new arrivals."></label>
     <label class="checkbox"><input type="checkbox" class="stock-cond" value="New" checked> New</label>
@@ -98,21 +113,22 @@ function buildStockRow(index) {
     <label>Models (comma-separated, matching the dealer site's exact model names) <input type="text" class="stock-models" placeholder="e.g. Tucson, Kona"></label>
     <label>Card limit <input type="number" class="stock-limit" value="12" min="1" max="24"></label>
   `;
+  stockRowsWrap.appendChild(row);
+  row.querySelector(".remove-btn").addEventListener("click", () => {
+    if (stockRowsWrap.querySelectorAll(".stock-row").length <= 1) return;
+    row.remove();
+    renumberStockRows();
+    scheduleUpdate();
+  });
+  wireLiveInputs(row);
+  renumberStockRows();
   return row;
 }
-stockRowsWrap.appendChild(buildStockRow(1));
+buildStockRow();
 
-const stockRow2Checkbox = document.getElementById("stockRow2Enabled");
-let stockRow2El = null;
-stockRow2Checkbox.addEventListener("change", () => {
-  if (stockRow2Checkbox.checked && !stockRow2El) {
-    stockRow2El = buildStockRow(2);
-    stockRowsWrap.appendChild(stockRow2El);
-    wireLiveInputs(stockRow2El);
-  } else if (!stockRow2Checkbox.checked && stockRow2El) {
-    stockRow2El.remove();
-    stockRow2El = null;
-  }
+addStockBtn.addEventListener("click", () => {
+  if (stockRowsWrap.querySelectorAll(".stock-row").length >= STOCK_MAX) return;
+  buildStockRow();
   scheduleUpdate();
 });
 

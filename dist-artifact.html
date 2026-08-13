@@ -1181,6 +1181,12 @@ function generateCSS(prefix, colours, style) {
         font-size: 15px !important;
         line-height: 1.25 !important;
         font-weight: 700 !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        -webkit-line-clamp: unset !important;
+        display: block !important;
+        text-align: center !important;
     }
 
     .${prefix}-stock-section .price,
@@ -1198,6 +1204,8 @@ function generateCSS(prefix, colours, style) {
         white-space: normal !important;
         overflow-wrap: anywhere !important;
         max-width: 100% !important;
+        display: block !important;
+        text-align: center !important;
     }
 
     .${prefix}-stock-section s,
@@ -1209,12 +1217,22 @@ function generateCSS(prefix, colours, style) {
         font-size: 12px !important;
     }
 
+    /* Best-effort: hides the condition/odometer/transmission/body-type chip
+       row under the price. Class names are a guess (AdTorque's exact markup
+       isn't publicly inspectable) — tell us the real class if this misses. */
     .${prefix}-stock-section .badge,
     .${prefix}-stock-section .tag,
+    .${prefix}-stock-section .spec,
+    .${prefix}-stock-section .specs,
+    .${prefix}-stock-section .attribute,
+    .${prefix}-stock-section .attributes,
     .${prefix}-stock-section [class*="badge"],
-    .${prefix}-stock-section [class*="tag"] {
-        font-size: 11px !important;
-        line-height: 1.2 !important;
+    .${prefix}-stock-section [class*="tag"],
+    .${prefix}-stock-section [class*="spec"],
+    .${prefix}-stock-section [class*="Spec"],
+    .${prefix}-stock-section [class*="attribute"],
+    .${prefix}-stock-section [class*="Attribute"] {
+        display: none !important;
     }
 
     .${prefix}-tcs {

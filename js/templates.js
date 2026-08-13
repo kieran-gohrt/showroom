@@ -433,6 +433,20 @@ function generateCSS(prefix, colours, style) {
         color: #fff !important;
     }
 
+    /* Confirmed real markup (inspected live on an AdTorque Edge site):
+       <div class="cow equal-height just-arrived">
+         <a href="..."></a>
+         <div class="cow-img" data-banner="..."><img ...></div>
+         <h2>2026 Hyundai Tucson Elite Auto 2WD MY26</h2>
+         <div class="cow-price-cat"><h3>
+           <span class="t-was">A$39,888</span>
+           <span class="price-marg"><span class="t-large">A$38,480</span> <span class="price-text">Ex Govt Charges</span></span>
+         </h3></div>
+         <div class="cow-content"><ul class="cow-il"><li><span>New</span></li>...</ul></div>
+       </div>
+       Fallback generic selectors are kept alongside in case another dealer
+       site's build differs — tell us the real class name if either misses. */
+    .${prefix}-stock-section .cow,
     .${prefix}-stock-section .vehicle-card,
     .${prefix}-stock-section .card,
     .${prefix}-stock-section article {
@@ -441,6 +455,7 @@ function generateCSS(prefix, colours, style) {
         color: #111 !important;
     }
 
+    .${prefix}-stock-section .cow h2,
     .${prefix}-stock-section h4,
     .${prefix}-stock-section .title,
     .${prefix}-stock-section [class*="title"],
@@ -454,16 +469,19 @@ function generateCSS(prefix, colours, style) {
         -webkit-line-clamp: unset !important;
         display: block !important;
         text-align: center !important;
+        margin: 10px 0 6px !important;
     }
 
+    .${prefix}-stock-section .cow-price-cat,
+    .${prefix}-stock-section .cow-price-cat h3 {
+        display: block !important;
+        text-align: center !important;
+    }
+
+    .${prefix}-stock-section .t-large,
     .${prefix}-stock-section .price,
     .${prefix}-stock-section [class*="price"],
-    .${prefix}-stock-section [class*="Price"],
-    .${prefix}-stock-section s,
-    .${prefix}-stock-section strike,
-    .${prefix}-stock-section del,
-    .${prefix}-stock-section [class*="was"],
-    .${prefix}-stock-section [class*="Was"] {
+    .${prefix}-stock-section [class*="Price"] {
         color: var(--${prefix}-primary) !important;
         font-weight: 700 !important;
         font-size: 14px !important;
@@ -471,10 +489,15 @@ function generateCSS(prefix, colours, style) {
         white-space: normal !important;
         overflow-wrap: anywhere !important;
         max-width: 100% !important;
-        display: block !important;
-        text-align: center !important;
     }
 
+    .${prefix}-stock-section .price-text {
+        color: #777 !important;
+        font-weight: 500 !important;
+        font-size: 11px !important;
+    }
+
+    .${prefix}-stock-section .t-was,
     .${prefix}-stock-section s,
     .${prefix}-stock-section strike,
     .${prefix}-stock-section del,
@@ -482,11 +505,11 @@ function generateCSS(prefix, colours, style) {
     .${prefix}-stock-section [class*="Was"] {
         color: #9a9a9a !important;
         font-size: 12px !important;
+        display: inline-block !important;
     }
 
-    /* Best-effort: hides the condition/odometer/transmission/body-type chip
-       row under the price. Class names are a guess (AdTorque's exact markup
-       isn't publicly inspectable) — tell us the real class if this misses. */
+    .${prefix}-stock-section .cow-content,
+    .${prefix}-stock-section .cow-il,
     .${prefix}-stock-section .badge,
     .${prefix}-stock-section .tag,
     .${prefix}-stock-section .spec,
@@ -567,7 +590,7 @@ function generateHTML(prefix, state) {
         <div class="${prefix}-stock-section">
             <h3>${escapeHtml(row.heading)}</h3>
             <p>${escapeHtml(row.intro)}</p>
-            <div class="featcars embla" id="${prefix}-stock-${i + 1}" data-path="stock" data-query="${query}" data-limit="${row.limit}" data-layout="" data-dots="true" data-arrows="true"></div>
+            <div class="featcars embla" id="${prefix}-stock-${i + 1}" data-path="stock" data-query="${query}" data-limit="${row.limit}" data-layout="" data-dots="true" data-arrows="false"></div>
         </div>`;
         })
         .join("")
