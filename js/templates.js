@@ -120,7 +120,7 @@ function generateCSS(prefix, colours, style) {
         position: relative;
         overflow: hidden;
         background: ${t.pageBg};
-        color: var(--${prefix}-white, ${t.textColor});
+        color: var(--${prefix}-white, ${t.textColor}) !important;
         text-align: center;
     }
 
@@ -154,7 +154,7 @@ function generateCSS(prefix, colours, style) {
         margin: 0 auto 16px;
         border-radius: 999px;
         background: ${isBold ? "rgba(255,255,255,0.1)" : "#111111"};
-        color: #fff;
+        color: #fff !important;
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.08em;
@@ -166,7 +166,7 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-hero-brand {
         margin: 0 0 6px;
-        color: var(--${prefix}-primary);
+        color: var(--${prefix}-primary) !important;
         font-size: clamp(12px, 1.1vw, 15px);
         line-height: 1.2;
         font-weight: 800;
@@ -176,7 +176,7 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-hero h1 {
         margin: 0;
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         font-size: clamp(28px, 4vw, 48px);
         line-height: 1.08;
         font-weight: 850;
@@ -188,7 +188,7 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-hero h2 {
         margin: 8px auto 16px;
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         font-size: clamp(18px, 2.4vw, 28px);
         line-height: 1.15;
         font-weight: 750;
@@ -200,12 +200,12 @@ function generateCSS(prefix, colours, style) {
     .${prefix}-hero-copy {
         max-width: 560px;
         margin: 0 auto 22px;
-        color: var(--${prefix}-grey);
+        color: var(--${prefix}-grey) !important;
         font-size: clamp(14px, 1.1vw, 16px);
         line-height: 1.55;
     }
 
-    .${prefix}-hero-copy strong { color: ${t.heroH1Color}; font-weight: 900; }
+    .${prefix}-hero-copy strong { color: ${t.heroH1Color} !important; font-weight: 900; }
 
     .${prefix}-date-banner {
         display: inline-flex;
@@ -214,7 +214,7 @@ function generateCSS(prefix, colours, style) {
         padding: 7px 16px;
         margin: 0 auto 22px;
         background: ${hexToRgba(colours.primary, isBold ? 0.16 : 0.08)};
-        color: var(--${prefix}-primary);
+        color: var(--${prefix}-primary) !important;
         font-size: clamp(11px, 1vw, 13px);
         line-height: 1.2;
         font-weight: 800;
@@ -273,11 +273,12 @@ function generateCSS(prefix, colours, style) {
         background: ${t.panelBg};
         box-shadow: ${t.panelShadow};
         text-align: center;
+        color: ${t.heroH1Color} !important;
     }
 
     .${prefix}-offer-panel h3 {
         margin: 0 0 10px;
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         font-size: clamp(20px, 2.4vw, 28px);
         line-height: 1.15;
         font-weight: 800;
@@ -288,7 +289,7 @@ function generateCSS(prefix, colours, style) {
     .${prefix}-offer-intro {
         max-width: 640px;
         margin: 0 auto 26px;
-        color: var(--${prefix}-grey);
+        color: var(--${prefix}-grey) !important;
         font-size: 14.5px;
         line-height: 1.55;
     }
@@ -336,7 +337,7 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-offer-card h4 {
         margin: 0 0 8px;
-        color: ${t.cardText};
+        color: ${t.cardText} !important;
         font-size: clamp(15px, 1.5vw, 18px);
         line-height: 1.2;
         font-weight: 800;
@@ -347,7 +348,7 @@ function generateCSS(prefix, colours, style) {
     .${prefix}-offer-card p {
         max-width: 280px;
         margin: 0 auto;
-        color: ${isBold ? "var(--" + prefix + "-grey)" : "#555555"};
+        color: ${isBold ? "var(--" + prefix + "-grey)" : "#555555"} !important;
         font-size: 13px;
         line-height: 1.5;
     }
@@ -363,13 +364,13 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-finance-teaser strong {
         display: block;
-        color: var(--${prefix}-primary);
+        color: var(--${prefix}-primary) !important;
         font-size: 18px;
         font-weight: 800;
         margin-bottom: 4px;
     }
 
-    .${prefix}-finance-teaser p { margin: 0; color: ${t.mutedText}; font-size: 13px; }
+    .${prefix}-finance-teaser p { margin: 0; color: ${t.mutedText} !important; font-size: 13px; }
 
     .${prefix}-ending-panel {
         margin: 24px auto 0;
@@ -377,20 +378,21 @@ function generateCSS(prefix, colours, style) {
         border-radius: 18px;
         background: ${t.sectionBg};
         border: 1px solid ${t.sectionBorder};
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         text-align: center;
         ${t.sectionBackdrop}
     }
 
     .${prefix}-ending-panel h3 {
         margin: 0 0 8px;
+        color: ${t.heroH1Color} !important;
         font-size: clamp(18px, 2.2vw, 24px);
         font-weight: 800;
         letter-spacing: -0.02em;
         text-transform: uppercase;
     }
 
-    .${prefix}-ending-panel p { max-width: 620px; margin: 0 auto; color: ${t.mutedText}; font-size: 14px; line-height: 1.55; }
+    .${prefix}-ending-panel p { max-width: 620px; margin: 0 auto; color: ${t.mutedText} !important; font-size: 14px; line-height: 1.55; }
 
     .${prefix}-stock-section {
         position: relative;
@@ -399,7 +401,7 @@ function generateCSS(prefix, colours, style) {
         border-radius: 20px;
         background: ${t.sectionBg};
         border: 1px solid ${t.sectionBorder};
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         text-align: center;
         overflow: hidden;
         ${t.sectionBackdrop}
@@ -407,13 +409,14 @@ function generateCSS(prefix, colours, style) {
 
     .${prefix}-stock-section h3 {
         margin: 0 0 6px;
+        color: ${t.heroH1Color} !important;
         font-size: clamp(17px, 1.8vw, 22px);
         font-weight: 800;
         letter-spacing: -0.01em;
         text-transform: uppercase;
     }
 
-    .${prefix}-stock-section p { max-width: 560px; margin: 0 auto 18px; color: ${t.mutedText}; font-size: 14px; line-height: 1.5; }
+    .${prefix}-stock-section > p { max-width: 560px; margin: 0 auto 18px; color: ${t.mutedText} !important; font-size: 14px; line-height: 1.5; }
 
     .${prefix}-stock-section .featcars, .${prefix}-stock-section .embla { position: relative; overflow: visible; }
     .${prefix}-stock-section .embla__viewport { overflow: hidden; }
@@ -458,9 +461,20 @@ function generateCSS(prefix, colours, style) {
     .${prefix}-stock-section .vehicle-card,
     .${prefix}-stock-section .card,
     .${prefix}-stock-section article {
+        position: relative !important;
         overflow: hidden;
         background: #fff !important;
         color: #111 !important;
+    }
+
+    /* The vehicle photo/title/price is wrapped by an empty <a> that overlays
+       the whole card to make it clickable. Force it on top explicitly so it
+       can't get covered by our display:block overrides above. */
+    .${prefix}-stock-section .cow > a:first-child {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 6 !important;
+        display: block !important;
     }
 
     .${prefix}-stock-section .cow h2,
@@ -540,13 +554,13 @@ function generateCSS(prefix, colours, style) {
         border-radius: 16px;
         background: ${isBold ? "rgba(255,255,255,0.06)" : "#f7f7f6"};
         border: 1px solid ${t.sectionBorder};
-        color: ${t.mutedText};
+        color: ${t.mutedText} !important;
         text-align: center;
     }
 
     .${prefix}-tcs h4 {
         margin: 0 0 10px;
-        color: ${t.heroH1Color};
+        color: ${t.heroH1Color} !important;
         font-size: 14px;
         font-weight: 800;
         text-transform: uppercase;
@@ -554,11 +568,11 @@ function generateCSS(prefix, colours, style) {
     }
 
     .${prefix}-tcs ul { list-style-position: inside; margin: 0; padding: 0; }
-    .${prefix}-tcs li { margin: 0 0 6px; font-size: 11.5px; line-height: 1.6; }
+    .${prefix}-tcs li { margin: 0 0 6px; color: ${t.mutedText} !important; font-size: 11.5px; line-height: 1.6; }
     .${prefix}-tcs li:last-child { margin-bottom: 0; }
 
     .${prefix}-tcs details { text-align: left; margin: 0 0 8px; }
-    .${prefix}-tcs summary { cursor: pointer; font-weight: 700; font-size: 12.5px; color: ${t.heroH1Color}; margin-bottom: 8px; }
+    .${prefix}-tcs summary { cursor: pointer; font-weight: 700; font-size: 12.5px; color: ${t.heroH1Color} !important; margin-bottom: 8px; }
 
     @media (max-width: 900px) {
         .${prefix}-wrapper { padding: 44px 0 36px; }

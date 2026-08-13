@@ -28,7 +28,7 @@ const BRAND_COLOURS = [
   { name: "Jaecoo", primary: "#a9822f", dark: "#7c5f22", black: "#0a0a0a" }, // unverified
   { name: "Jaguar", primary: "#1b1b1b", dark: "#000000", black: "#0a0a0a" }, // unverified — 2024 rebrand still settling
   { name: "Jeep", primary: "#4a5d23", dark: "#333f18", black: "#0a0a0a" },
-  { name: "Kia", primary: "#ea0029", dark: "#b30020", black: "#05141e" },
+  { name: "Kia", primary: "#4a4a4a", dark: "#2b2b2b", black: "#0a0a0a" },
   { name: "Land Rover", primary: "#0b6836", dark: "#073d1f", black: "#0a0a0a" },
   { name: "LDV", primary: "#e2231a", dark: "#a91a13", black: "#0a0a0a" },
   { name: "Lexus", primary: "#1a1a1a", dark: "#000000", black: "#0a0a0a" },
