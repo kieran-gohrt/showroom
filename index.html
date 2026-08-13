@@ -17,6 +17,7 @@
     <nav class="tabs">
         <button class="tab-btn active" data-tab="landing">Landing Page</button>
         <button class="tab-btn" data-tab="form">Contact Form</button>
+        <button class="tab-btn" data-tab="pmax">PMAX Copy</button>
     </nav>
 </header>
 
@@ -290,6 +291,77 @@
     </div>
 </section>
 
+<!-- ============ PMAX COPY TAB ============ -->
+<section id="panel-pmax" class="tab-panel app-grid">
+    <div class="form-col">
+        <div class="form-col-scroll">
+        <details class="section" open>
+            <summary>Offer details</summary>
+            <div class="section-body">
+                <label>Dealership name
+                    <input type="text" id="pmaxDealer" placeholder="e.g. Melville Hyundai">
+                </label>
+                <label>Model(s) - optional, comma-separated
+                    <input type="text" id="pmaxModels" placeholder="e.g. Tucson, Santa Fe">
+                </label>
+                <label>Offer type
+                    <select id="pmaxOfferType">
+                        <option value="cashback">Cashback</option>
+                        <option value="finance">Finance rate</option>
+                        <option value="clearance">Clearance / plate clearance</option>
+                        <option value="bonus">Bonus / free extra</option>
+                        <option value="general">General range / event</option>
+                    </select>
+                </label>
+                <label>Offer value
+                    <input type="text" id="pmaxOfferValue" placeholder="e.g. $2,000 or 3.9% or $99/week">
+                </label>
+                <label>Scope
+                    <select id="pmaxScope">
+                        <option value="all">All stock</option>
+                        <option value="selected">Selected models</option>
+                        <option value="new">New only</option>
+                        <option value="demo">Demo only</option>
+                        <option value="newDemo">New &amp; Demo</option>
+                        <option value="used">Used</option>
+                    </select>
+                </label>
+                <label>Urgency
+                    <select id="pmaxUrgency">
+                        <option value="none">None</option>
+                        <option value="soft">Limited time</option>
+                        <option value="hard">Urgent - final days, last chance</option>
+                    </select>
+                </label>
+                <label>End date - optional
+                    <input type="text" id="pmaxEndDate" placeholder="e.g. 31 August">
+                </label>
+                <label class="checkbox"><input type="checkbox" id="pmaxTcs"> Include "T&amp;Cs apply" in descriptions</label>
+                <label class="checkbox"><input type="checkbox" id="pmaxDriveAway"> Drive away pricing</label>
+            </div>
+        </details>
+        </div>
+
+        <div class="generate-bar">
+            <button id="generatePmaxBtn" class="generate-btn">Generate PMAX copy</button>
+        </div>
+    </div>
+    <div class="preview-col">
+        <div id="pmaxPreviewPlaceholder" class="preview-placeholder">
+            <p>Fill in the offer details on the left, then hit <strong>Generate PMAX copy</strong> to see it here.</p>
+        </div>
+        <div id="pmaxPreviewContent" class="preview-content" hidden>
+            <div class="code-output">
+                <div class="code-toolbar">
+                    <span>PMAX Copy</span>
+                    <button id="copyPmaxCode">Copy code</button>
+                </div>
+                <textarea id="pmaxCodeOutput" readonly rows="24"></textarea>
+            </div>
+        </div>
+    </div>
+</section>
+
 </main>
 
 <footer class="app-footer">
@@ -299,6 +371,7 @@
 <script src="js/brands.js"></script>
 <script src="js/templates.js"></script>
 <script src="js/formgen.js"></script>
+<script src="js/pmaxgen.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>

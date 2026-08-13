@@ -486,5 +486,37 @@ wireLiveInputs(document.getElementById("panel-form"));
 document.getElementById("copyFormCode").addEventListener("click", () => copyToClipboard("formCodeOutput"));
 document.getElementById("copyEmailCode").addEventListener("click", () => copyToClipboard("emailCodeOutput"));
 
+// ---------- PMAX Copy tab ----------
+const pmaxPreviewPlaceholder = document.getElementById("pmaxPreviewPlaceholder");
+const pmaxPreviewContent = document.getElementById("pmaxPreviewContent");
+
+function collectPmaxState() {
+  return {
+    dealer: val("pmaxDealer") || "the dealership",
+    models: val("pmaxModels").split(",").map((m) => m.trim()).filter(Boolean),
+    offerType: val("pmaxOfferType"),
+    offerValue: val("pmaxOfferValue").trim(),
+    scope: val("pmaxScope"),
+    urgency: val("pmaxUrgency"),
+    endDate: val("pmaxEndDate").trim(),
+    tcsApply: checked("pmaxTcs"),
+    driveAway: checked("pmaxDriveAway"),
+  };
+}
+
+function updatePmaxOutput() {
+  const state = collectPmaxState();
+  const result = generatePmaxCopy(state);
+  document.getElementById("pmaxCodeOutput").value = formatPmaxOutput(result);
+}
+
+document.getElementById("generatePmaxBtn").addEventListener("click", () => {
+  pmaxPreviewPlaceholder.hidden = true;
+  pmaxPreviewContent.hidden = false;
+  updatePmaxOutput();
+});
+
+document.getElementById("copyPmaxCode").addEventListener("click", () => copyToClipboard("pmaxCodeOutput"));
+
 // ---------- Init ----------
 applyBrandColours();
