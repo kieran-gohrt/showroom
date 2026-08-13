@@ -1,12 +1,17 @@
 // @ts-nocheck
 /*
- * Cloudflare Worker — turns a one-line campaign brief into structured
- * landing-page copy using Workers AI (free tier). Deploy via the Cloudflare
- * dashboard: Workers & Pages -> Create -> Worker -> paste this file's
- * contents into the editor -> Settings -> Bindings -> Add binding ->
- * "Workers AI" -> name it "AI" -> Deploy.
+ * Cloudflare Pages Function — same-origin AI endpoint at
+ * /api/generate on showroom.sortedstudios.com.au. Because it's served
+ * from the same hostname as the app (not a separate *.workers.dev URL),
+ * it automatically sits behind the same Cloudflare Access login wall —
+ * no separate exposed endpoint, no CORS needed, nothing for a customer
+ * to see or copy.
  *
- * No wrangler/CLI required. See worker/README.md for the full walkthrough.
+ * Deploy: this file just needs to exist in functions/api/generate.js in
+ * the repo — Cloudflare Pages picks it up automatically on the next
+ * deploy. You still need to add the Workers AI binding once, on the
+ * Pages project itself: Pages project -> Settings -> Functions ->
+ * Bindings -> Add -> Workers AI -> name it "AI".
  */
 
 const SYSTEM_PROMPT = `You are a copywriting assistant for an Australian car dealership landing-page tool.
@@ -42,71 +47,60 @@ Rules:
 - Keep copy Australian in spelling and tone (e.g. "enquire" not "inquire").
 - Keep it punchy and dealership-appropriate: short sentences, no corporate fluff.`;
 
-function corsHeaders() {
-  return {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
-  };
-}
-
 function json(obj, status) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "Content-Type": "application/json", ...corsHeaders() },
+    headers: { "Content-Type": "application/json" },
   });
 }
 
-export default {
-  async fetch(request, env) {
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders() });
-    }
-    if (request.method !== "POST") {
-      return json({ error: "Method not allowed" }, 405);
-    }
+export async function onRequestPost(context) {
+  const { request, env } = context;
 
-    let brief;
+  let brief;
+  try {
+    const body = await request.json();
+    brief = (body.brief || "").trim();
+  } catch {
+    return json({ error: "Invalid request body" }, 400);
+  }
+
+  if (brief.length < 5) {
+    return json({ error: "Give a slightly longer campaign description." }, 400);
+  }
+  if (brief.length > 500) {
+    return json({ error: "Keep the campaign description under 500 characters." }, 400);
+  }
+
+  try {
+    const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: brief },
+      ],
+      temperature: 0.4,
+    });
+
+    const raw = (result.response || "").trim();
+    const cleaned = raw
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "")
+      .trim();
+
+    let data;
     try {
-      const body = await request.json();
-      brief = (body.brief || "").trim();
+      data = JSON.parse(cleaned);
     } catch {
-      return json({ error: "Invalid request body" }, 400);
+      return json({ error: "Couldn't understand that response — try rephrasing your brief." }, 502);
     }
 
-    if (brief.length < 5) {
-      return json({ error: "Give a slightly longer campaign description." }, 400);
-    }
-    if (brief.length > 500) {
-      return json({ error: "Keep the campaign description under 500 characters." }, 400);
-    }
+    return json(data, 200);
+  } catch (err) {
+    return json({ error: "AI generation failed. Try again in a moment." }, 500);
+  }
+}
 
-    try {
-      const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: brief },
-        ],
-        temperature: 0.4,
-      });
-
-      const raw = (result.response || "").trim();
-      const cleaned = raw
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/i, "")
-        .replace(/```\s*$/i, "")
-        .trim();
-
-      let data;
-      try {
-        data = JSON.parse(cleaned);
-      } catch {
-        return json({ error: "Couldn't understand that response — try rephrasing your brief." }, 502);
-      }
-
-      return json(data, 200);
-    } catch (err) {
-      return json({ error: "AI generation failed. Try again in a moment." }, 500);
-    }
-  },
-};
+export async function onRequestOptions() {
+  return new Response(null, { status: 204 });
+}

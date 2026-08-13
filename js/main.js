@@ -426,15 +426,13 @@ document.getElementById("copyFormCode").addEventListener("click", () => copyToCl
 document.getElementById("copyEmailCode").addEventListener("click", () => copyToClipboard("emailCodeOutput"));
 
 // ---------- AI campaign brief -> auto-fill wizard ----------
-const aiEndpointInput = document.getElementById("aiEndpoint");
+// Same-origin endpoint (Cloudflare Pages Function at /api/generate) — sits
+// behind the same Cloudflare Access login as the rest of the app, no
+// separate URL for a customer to ever see or need to configure.
+const AI_ENDPOINT = "/api/generate";
 const aiBriefInput = document.getElementById("aiBrief");
 const aiGenerateBtn = document.getElementById("aiGenerateBtn");
 const aiStatus = document.getElementById("aiStatus");
-
-aiEndpointInput.value = localStorage.getItem("showroom-ai-endpoint") || "";
-aiEndpointInput.addEventListener("change", () => {
-  localStorage.setItem("showroom-ai-endpoint", aiEndpointInput.value.trim());
-});
 
 function setFieldValue(id, v) {
   const el = document.getElementById(id);
@@ -511,13 +509,8 @@ function applyAiResult(data) {
 }
 
 aiGenerateBtn.addEventListener("click", async () => {
-  const endpoint = aiEndpointInput.value.trim();
   const brief = aiBriefInput.value.trim();
 
-  if (!endpoint) {
-    aiStatus.textContent = "Add your Worker URL under \"AI endpoint settings\" first.";
-    return;
-  }
   if (brief.length < 5) {
     aiStatus.textContent = "Describe the campaign in a sentence or two first.";
     return;
@@ -527,7 +520,7 @@ aiGenerateBtn.addEventListener("click", async () => {
   aiStatus.textContent = "Generating…";
 
   try {
-    const res = await fetch(endpoint, {
+    const res = await fetch(AI_ENDPOINT, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ brief }),
@@ -540,7 +533,7 @@ aiGenerateBtn.addEventListener("click", async () => {
     applyAiResult(data);
     aiStatus.textContent = "Done — review the fields below, then hit Generate.";
   } catch (err) {
-    aiStatus.textContent = "Couldn't reach the AI endpoint — check the Worker URL and try again.";
+    aiStatus.textContent = "Something went wrong generating your page. Try again.";
   } finally {
     aiGenerateBtn.disabled = false;
   }

@@ -441,24 +441,6 @@ button { cursor: pointer; font-family: inherit; }
 
 .ai-brief .hint { margin: 8px 0 0; }
 
-.ai-settings {
-    margin-top: 8px;
-    border-top: 1px solid rgba(255,199,44,0.18);
-    padding-top: 6px;
-}
-
-.ai-settings summary {
-    cursor: pointer;
-    font-size: 11px;
-    color: var(--text-faint);
-    list-style: none;
-    padding: 4px 0;
-}
-
-.ai-settings summary::-webkit-details-marker { display: none; }
-
-.ai-settings label { margin-top: 8px; }
-
 @media (max-width: 900px) {
     .app-grid { grid-template-columns: 1fr; height: auto; }
     .form-col { border-right: none; border-bottom: 1px solid var(--border); }
