@@ -425,6 +425,127 @@ wireLiveInputs(document.getElementById("panel-form"));
 document.getElementById("copyFormCode").addEventListener("click", () => copyToClipboard("formCodeOutput"));
 document.getElementById("copyEmailCode").addEventListener("click", () => copyToClipboard("emailCodeOutput"));
 
+// ---------- AI campaign brief -> auto-fill wizard ----------
+const aiEndpointInput = document.getElementById("aiEndpoint");
+const aiBriefInput = document.getElementById("aiBrief");
+const aiGenerateBtn = document.getElementById("aiGenerateBtn");
+const aiStatus = document.getElementById("aiStatus");
+
+aiEndpointInput.value = localStorage.getItem("showroom-ai-endpoint") || "";
+aiEndpointInput.addEventListener("change", () => {
+  localStorage.setItem("showroom-ai-endpoint", aiEndpointInput.value.trim());
+});
+
+function setFieldValue(id, v) {
+  const el = document.getElementById(id);
+  if (!el || v === undefined || v === null) return;
+  el.value = v;
+}
+
+function setFieldChecked(id, v) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.checked = !!v;
+  el.dispatchEvent(new Event("change"));
+}
+
+function applyAiResult(data) {
+  // Brand — match against the known list case-insensitively, else leave as Custom.
+  if (data.brandName) {
+    const match = BRAND_COLOURS.find(
+      (b) => b.name.toLowerCase() === String(data.brandName).trim().toLowerCase()
+    );
+    brandSelect.value = match ? match.name : "";
+    applyBrandColours();
+  }
+
+  setFieldValue("dealershipName", data.dealershipName);
+  setFieldValue("suburb", data.suburb);
+  setFieldValue("heroBrandLine", data.heroBrandLine);
+  setFieldValue("heading", data.heading);
+  setFieldValue("subheading", data.subheading);
+  setFieldValue("paragraph", data.paragraph);
+  setFieldValue("ctaPrimaryText", data.ctaPrimaryText);
+
+  setFieldChecked("urgencyEnabled", !!data.urgencyText);
+  setFieldValue("urgencyText", data.urgencyText);
+
+  setFieldChecked("dateBannerEnabled", !!data.dateBannerText);
+  setFieldValue("dateBannerText", data.dateBannerText);
+
+  // Offers
+  const offers = Array.isArray(data.offers) ? data.offers.slice(0, OFFER_MAX) : [];
+  setFieldChecked("offersEnabled", offers.length > 0);
+  setFieldValue("offerHeading", data.offerHeading);
+  setFieldValue("offerIntro", data.offerIntro);
+  offersList.innerHTML = "";
+  offers.forEach((o) => addOfferRow(o.title || "", o.description || ""));
+
+  // Stock — collapse to a single row and fill it from the AI result.
+  setFieldChecked("stockEnabled", true);
+  stockRowsWrap.innerHTML = "";
+  stockRowCounter = 0;
+  const row = buildStockRow();
+  row.querySelector(".stock-heading").value = data.stockHeading || "";
+  row.querySelector(".stock-intro").value = data.stockIntro || "";
+  const conditions = Array.isArray(data.stockConditions) && data.stockConditions.length
+    ? data.stockConditions
+    : ["New"];
+  row.querySelectorAll(".stock-cond").forEach((cb) => {
+    cb.checked = conditions.includes(cb.value);
+  });
+  row.querySelector(".stock-models").value = Array.isArray(data.stockModels)
+    ? data.stockModels.join(", ")
+    : "";
+
+  setFieldChecked("endingEnabled", !!(data.endingHeading || data.endingText));
+  setFieldValue("endingHeading", data.endingHeading);
+  setFieldValue("endingText", data.endingText);
+
+  const tcsItems = Array.isArray(data.tcsItems) ? data.tcsItems : [];
+  setFieldChecked("tcsEnabled", tcsItems.length > 0);
+  if (!document.getElementById("tcsHeading").value) {
+    setFieldValue("tcsHeading", "Terms & Conditions");
+  }
+  setFieldValue("tcsItems", tcsItems.join("\n"));
+}
+
+aiGenerateBtn.addEventListener("click", async () => {
+  const endpoint = aiEndpointInput.value.trim();
+  const brief = aiBriefInput.value.trim();
+
+  if (!endpoint) {
+    aiStatus.textContent = "Add your Worker URL under \"AI endpoint settings\" first.";
+    return;
+  }
+  if (brief.length < 5) {
+    aiStatus.textContent = "Describe the campaign in a sentence or two first.";
+    return;
+  }
+
+  aiGenerateBtn.disabled = true;
+  aiStatus.textContent = "Generating…";
+
+  try {
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ brief }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      aiStatus.textContent = data.error || "Something went wrong. Try again.";
+      return;
+    }
+    applyAiResult(data);
+    aiStatus.textContent = "Done — review the fields below, then hit Generate.";
+  } catch (err) {
+    aiStatus.textContent = "Couldn't reach the AI endpoint — check the Worker URL and try again.";
+  } finally {
+    aiGenerateBtn.disabled = false;
+  }
+});
+
 // ---------- Init ----------
 applyBrandColours();
 updateFormOutputs();

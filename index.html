@@ -27,6 +27,21 @@
     <div class="form-col">
         <div class="form-col-scroll">
 
+        <div class="ai-brief">
+            <label>Describe your campaign
+                <textarea id="aiBrief" rows="3" placeholder="e.g. Melville Hyundai. $2000 cashback offer across new and demo vehicles. Ends August 31st."></textarea>
+            </label>
+            <button type="button" id="aiGenerateBtn" class="ai-btn">✨ Generate with AI</button>
+            <p class="hint" id="aiStatus"></p>
+            <details class="ai-settings">
+                <summary>AI endpoint settings</summary>
+                <label>Worker URL
+                    <input type="text" id="aiEndpoint" placeholder="https://showroom-ai.your-subdomain.workers.dev">
+                </label>
+                <p class="hint">Saved in this browser only. See worker/README.md for how to deploy your own.</p>
+            </details>
+        </div>
+
         <details class="section" open>
             <summary>Dealership</summary>
             <div class="section-body">
