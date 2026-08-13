@@ -11,14 +11,24 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
   });
 });
 
-// ---------- Brand select ----------
-const brandSelect = document.getElementById("brandName");
-BRAND_COLOURS.forEach((b) => {
-  const opt = document.createElement("option");
-  opt.value = b.name;
-  opt.textContent = b.name;
-  brandSelect.appendChild(opt);
+// ---------- Dependent field show/hide (checkbox -> .dep-fields) ----------
+document.querySelectorAll("[data-toggle]").forEach((cb) => {
+  const target = document.getElementById(cb.dataset.toggle);
+  const sync = () => { target.hidden = !cb.checked; };
+  sync();
+  cb.addEventListener("change", sync);
 });
+
+// ---------- Brand select (alphabetical) ----------
+const brandSelect = document.getElementById("brandName");
+[...BRAND_COLOURS]
+  .sort((a, b) => a.name.localeCompare(b.name))
+  .forEach((b) => {
+    const opt = document.createElement("option");
+    opt.value = b.name;
+    opt.textContent = b.name;
+    brandSelect.appendChild(opt);
+  });
 const customOpt = document.createElement("option");
 customOpt.value = "";
 customOpt.textContent = "Custom / other";
@@ -34,27 +44,52 @@ function applyBrandColours() {
 }
 brandSelect.addEventListener("change", applyBrandColours);
 
-// ---------- Offers (6 toggleable rows) ----------
+// ---------- Offers (dynamic add/remove, 3-6) ----------
 const offersList = document.getElementById("offersList");
+const addOfferBtn = document.getElementById("addOfferBtn");
+const OFFER_MIN = 3;
+const OFFER_MAX = 6;
 const defaultOffers = [
   ["Drive Away Pricing", "No hidden extras, just one straightforward price."],
   ["Low Rate Finance", "Speak to our team about finance options tailored to you."],
   ["Extended Warranty", "Extra peace of mind on every new vehicle we sell."],
-  ["Free Accessories Pack", "Selected models come with a bonus accessories pack."],
-  ["Trade-In Bonus", "Get a better deal on your trade-in this month."],
-  ["Free Service", "Complimentary first service included."],
 ];
-defaultOffers.forEach(([title, desc], i) => {
+
+function renumberOffers() {
+  const rows = offersList.querySelectorAll(".offer-row");
+  rows.forEach((row, i) => {
+    row.querySelector(".offer-row-head span").textContent = `Offer ${i + 1}`;
+    row.querySelector(".remove-btn").disabled = rows.length <= OFFER_MIN;
+  });
+  addOfferBtn.disabled = rows.length >= OFFER_MAX;
+}
+
+function addOfferRow(title = "", desc = "") {
   const row = document.createElement("div");
   row.className = "offer-row";
   row.innerHTML = `
     <div class="offer-row-head">
-      <label class="checkbox"><input type="checkbox" class="offer-enabled" ${i < 3 ? "checked" : ""}> Offer ${i + 1}</label>
+      <span>Offer</span>
+      <button type="button" class="remove-btn">Remove</button>
     </div>
     <label>Title <input type="text" class="offer-title" value="${title}"></label>
     <label>Description <textarea class="offer-desc">${desc}</textarea></label>
   `;
   offersList.appendChild(row);
+  row.querySelector(".remove-btn").addEventListener("click", () => {
+    if (offersList.querySelectorAll(".offer-row").length <= OFFER_MIN) return;
+    row.remove();
+    renumberOffers();
+    scheduleUpdate();
+  });
+  wireLiveInputs(row);
+  renumberOffers();
+}
+defaultOffers.forEach(([t, d]) => addOfferRow(t, d));
+addOfferBtn.addEventListener("click", () => {
+  if (offersList.querySelectorAll(".offer-row").length >= OFFER_MAX) return;
+  addOfferRow("New Offer", "Describe the offer here.");
+  scheduleUpdate();
 });
 
 // ---------- Stock rows ----------
@@ -92,29 +127,12 @@ stockRow2Checkbox.addEventListener("change", () => {
   scheduleUpdate();
 });
 
-// ---------- Enable/disable dependent fields ----------
-function bindToggle(checkboxId, fieldIds) {
-  const cb = document.getElementById(checkboxId);
-  cb.addEventListener("change", () => {
-    fieldIds.forEach((id) => {
-      document.getElementById(id).disabled = !cb.checked;
-    });
-    scheduleUpdate();
-  });
-}
-bindToggle("urgencyEnabled", ["urgencyText"]);
-bindToggle("ctaSecondaryEnabled", ["ctaSecondaryText", "ctaSecondaryHref"]);
-bindToggle("financeEnabled", ["financeHeadline", "financeText"]);
-bindToggle("departmentEnabled", ["departmentValue"]);
-
 // ---------- Collect state ----------
 function collectOffers() {
-  return [...offersList.querySelectorAll(".offer-row")]
-    .filter((row) => row.querySelector(".offer-enabled").checked)
-    .map((row) => ({
-      title: row.querySelector(".offer-title").value,
-      description: row.querySelector(".offer-desc").value,
-    }));
+  return [...offersList.querySelectorAll(".offer-row")].map((row) => ({
+    title: row.querySelector(".offer-title").value,
+    description: row.querySelector(".offer-desc").value,
+  }));
 }
 
 function collectStockRows() {
@@ -215,7 +233,13 @@ function buildPreviewDoc(state) {
   </head><body>${html}</body></html>`;
 }
 
+// ---------- Generate / live-update gating ----------
+let hasGenerated = false;
+const previewPlaceholder = document.getElementById("previewPlaceholder");
+const previewContent = document.getElementById("previewContent");
+
 function scheduleUpdate() {
+  if (!hasGenerated) return; // no preview until first Generate click
   clearTimeout(scheduleUpdate._t);
   scheduleUpdate._t = setTimeout(updateLandingOutputs, 200);
 }
@@ -226,6 +250,13 @@ function updateLandingOutputs() {
   document.getElementById("landingCodeOutput").value = code;
   document.getElementById("previewFrame").srcdoc = buildPreviewDoc(state);
 }
+
+document.getElementById("generateBtn").addEventListener("click", () => {
+  hasGenerated = true;
+  previewPlaceholder.hidden = true;
+  previewContent.hidden = false;
+  updateLandingOutputs();
+});
 
 function wireLiveInputs(root) {
   root.querySelectorAll("input, textarea, select").forEach((el) => {
@@ -247,10 +278,8 @@ function copyToClipboard(textareaId) {
 
 // ---------- Contact form tab ----------
 const formFieldsList = document.getElementById("formFieldsList");
-let fieldCounter = 0;
 
 function addFieldRow(defaults = {}) {
-  fieldCounter++;
   const row = document.createElement("div");
   row.className = "field-row";
   const name = defaults.name || "";
@@ -343,5 +372,4 @@ document.getElementById("copyEmailCode").addEventListener("click", () => copyToC
 
 // ---------- Init ----------
 applyBrandColours();
-updateLandingOutputs();
 updateFormOutputs();
