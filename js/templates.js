@@ -41,7 +41,7 @@ function rgbToHex(r, g, b) {
   return `#${c(r)}${c(g)}${c(b)}`;
 }
 
-// True WCAG relative luminance (0 black - 1 white), gamma-corrected — unlike
+// True WCAG relative luminance (0 black - 1 white), gamma-corrected - unlike
 // a simple weighted-brightness average, this doesn't unfairly flag saturated
 // colours (e.g. a pure red reads as "dark" under naive weighting despite
 // having decent real contrast against black).
@@ -73,7 +73,7 @@ function mixHex(hex, targetRgb, amount) {
 
 // A brand's accent colour is used directly as small text/border on a dark
 // (bold) or light (slick) background. If the colour itself doesn't have
-// enough real contrast against that background it becomes unreadable —
+// enough real contrast against that background it becomes unreadable -
 // this happens for any muted/near-black or near-white brand colour, not
 // just one brand. Nudge it toward white/black just enough to clear a
 // minimum contrast ratio, leaving already-legible colours (saturated reds,
@@ -525,7 +525,7 @@ function generateCSS(prefix, colours, style) {
          <div class="cow-content"><ul class="cow-il"><li><span>New</span></li>...</ul></div>
        </div>
        Fallback generic selectors are kept alongside in case another dealer
-       site's build differs — tell us the real class name if either misses. */
+       site's build differs - tell us the real class name if either misses. */
     .${prefix}-stock-section .cow,
     .${prefix}-stock-section .vehicle-card,
     .${prefix}-stock-section .card,
@@ -736,7 +736,7 @@ function generateHTML(prefix, state) {
   // from a real reference template): a plain anchor + the theme's global
   // "content grey-bg" / "sml-wrapper t-center" classes wrapping whatever
   // [ate-form ...] shortcode the user pastes in. Never escape the shortcode
-  // itself — it must render as literal WordPress shortcode text, not HTML
+  // itself - it must render as literal WordPress shortcode text, not HTML
   // entities, for the theme to parse it.
   const formHtml = state.formEnabled
     ? `
@@ -744,7 +744,7 @@ function generateHTML(prefix, state) {
 <section class="content grey-bg">
     <div class="sml-wrapper t-center">
         <h2 class="h1">${escapeHtml(state.formHeading || "Enquire Now")}</h2>
-        ${state.formShortcode || '<!-- PASTE YOUR FORM SHORTCODE HERE, e.g. [ate-form title="Contact Form"] — create the form in WordPress first, then paste its shortcode in place of this comment -->'}
+        ${state.formShortcode || '<!-- PASTE YOUR FORM SHORTCODE HERE, e.g. [ate-form title="Contact Form"] - create the form in WordPress first, then paste its shortcode in place of this comment -->'}
     </div>
 </section>`
     : "";

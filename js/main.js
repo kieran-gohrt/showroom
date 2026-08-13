@@ -270,7 +270,7 @@ function mockStockCardsHtml(prefix, row) {
       </div>`;
   }
   return `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;margin-top:16px;">${cards}</div>
-  <p style="font-size:12px;opacity:0.6;margin-top:14px;">Preview only — real vehicles populate once this is live on your site.</p>`;
+  <p style="font-size:12px;opacity:0.6;margin-top:14px;">Preview only - real vehicles populate once this is live on your site.</p>`;
 }
 
 function buildPreviewDoc(state) {
@@ -427,120 +427,6 @@ function updateFormOutputs() {
 wireLiveInputs(document.getElementById("panel-form"));
 document.getElementById("copyFormCode").addEventListener("click", () => copyToClipboard("formCodeOutput"));
 document.getElementById("copyEmailCode").addEventListener("click", () => copyToClipboard("emailCodeOutput"));
-
-// ---------- AI campaign brief -> auto-fill wizard ----------
-// Same-origin endpoint (Cloudflare Pages Function at /api/generate) — sits
-// behind the same Cloudflare Access login as the rest of the app, no
-// separate URL for a customer to ever see or need to configure.
-const AI_ENDPOINT = "/api/generate";
-const aiBriefInput = document.getElementById("aiBrief");
-const aiGenerateBtn = document.getElementById("aiGenerateBtn");
-const aiStatus = document.getElementById("aiStatus");
-
-function setFieldValue(id, v) {
-  const el = document.getElementById(id);
-  if (!el || v === undefined || v === null) return;
-  el.value = v;
-}
-
-function setFieldChecked(id, v) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.checked = !!v;
-  el.dispatchEvent(new Event("change"));
-}
-
-function applyAiResult(data) {
-  // Brand — match against the known list case-insensitively, else leave as Custom.
-  if (data.brandName) {
-    const match = BRAND_COLOURS.find(
-      (b) => b.name.toLowerCase() === String(data.brandName).trim().toLowerCase()
-    );
-    brandSelect.value = match ? match.name : "";
-    applyBrandColours();
-  }
-
-  setFieldValue("dealershipName", data.dealershipName);
-  setFieldValue("suburb", data.suburb);
-  setFieldValue("heroBrandLine", data.heroBrandLine);
-  setFieldValue("heading", data.heading);
-  setFieldValue("subheading", data.subheading);
-  setFieldValue("paragraph", data.paragraph);
-  setFieldValue("ctaPrimaryText", data.ctaPrimaryText);
-
-  setFieldChecked("urgencyEnabled", !!data.urgencyText);
-  setFieldValue("urgencyText", data.urgencyText);
-
-  setFieldChecked("dateBannerEnabled", !!data.dateBannerText);
-  setFieldValue("dateBannerText", data.dateBannerText);
-
-  // Offers
-  const offers = Array.isArray(data.offers) ? data.offers.slice(0, OFFER_MAX) : [];
-  setFieldChecked("offersEnabled", offers.length > 0);
-  setFieldValue("offerHeading", data.offerHeading);
-  setFieldValue("offerIntro", data.offerIntro);
-  offersList.innerHTML = "";
-  offers.forEach((o) => addOfferRow(o.title || "", o.description || ""));
-
-  // Stock — collapse to a single row and fill it from the AI result.
-  setFieldChecked("stockEnabled", true);
-  stockRowsWrap.innerHTML = "";
-  stockRowCounter = 0;
-  const row = buildStockRow();
-  row.querySelector(".stock-heading").value = data.stockHeading || "";
-  row.querySelector(".stock-intro").value = data.stockIntro || "";
-  const conditions = Array.isArray(data.stockConditions) && data.stockConditions.length
-    ? data.stockConditions
-    : ["New"];
-  row.querySelectorAll(".stock-cond").forEach((cb) => {
-    cb.checked = conditions.includes(cb.value);
-  });
-  row.querySelector(".stock-models").value = Array.isArray(data.stockModels)
-    ? data.stockModels.join(", ")
-    : "";
-
-  setFieldChecked("endingEnabled", !!(data.endingHeading || data.endingText));
-  setFieldValue("endingHeading", data.endingHeading);
-  setFieldValue("endingText", data.endingText);
-
-  const tcsItems = Array.isArray(data.tcsItems) ? data.tcsItems : [];
-  setFieldChecked("tcsEnabled", tcsItems.length > 0);
-  if (!document.getElementById("tcsHeading").value) {
-    setFieldValue("tcsHeading", "Terms & Conditions");
-  }
-  setFieldValue("tcsItems", tcsItems.join("\n"));
-}
-
-aiGenerateBtn.addEventListener("click", async () => {
-  const brief = aiBriefInput.value.trim();
-
-  if (brief.length < 5) {
-    aiStatus.textContent = "Describe the campaign in a sentence or two first.";
-    return;
-  }
-
-  aiGenerateBtn.disabled = true;
-  aiStatus.textContent = "Generating…";
-
-  try {
-    const res = await fetch(AI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ brief }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      aiStatus.textContent = data.error || "Something went wrong. Try again.";
-      return;
-    }
-    applyAiResult(data);
-    aiStatus.textContent = "Done — review the fields below, then hit Generate.";
-  } catch (err) {
-    aiStatus.textContent = "Something went wrong generating your page. Try again.";
-  } finally {
-    aiGenerateBtn.disabled = false;
-  }
-});
 
 // ---------- Init ----------
 applyBrandColours();

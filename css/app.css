@@ -415,32 +415,6 @@ button { cursor: pointer; font-family: inherit; }
     color: var(--text-faint);
 }
 
-.ai-brief {
-    border: 1px solid rgba(255,199,44,0.3);
-    background: linear-gradient(180deg, rgba(255,199,44,0.08), rgba(255,199,44,0.02));
-    border-radius: var(--radius-lg);
-    padding: 12px 12px 14px;
-    margin: 4px 0 6px;
-}
-
-.ai-btn {
-    width: 100%;
-    background: var(--accent);
-    color: #0B0B0B;
-    border: none;
-    border-radius: var(--radius);
-    padding: 10px;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    transition: background 0.15s ease, opacity 0.15s ease;
-}
-
-.ai-btn:hover { background: var(--accent-hover); }
-.ai-btn:disabled { opacity: 0.55; cursor: not-allowed; }
-
-.ai-brief .hint { margin: 8px 0 0; }
-
 @media (max-width: 900px) {
     .app-grid { grid-template-columns: 1fr; height: auto; }
     .form-col { border-right: none; border-bottom: 1px solid var(--border); }

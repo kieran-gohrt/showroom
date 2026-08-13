@@ -13,7 +13,7 @@ const BRAND_COLOURS = [
   { name: "Chery", primary: "#c8102e", dark: "#8f0b20", black: "#0a0a0a" },
   { name: "Chevrolet", primary: "#f1b51c", dark: "#c99400", black: "#0a0a0a" },
   { name: "Citroen", primary: "#c8102e", dark: "#8f0b20", black: "#0a0a0a" },
-  { name: "Cupra", primary: "#a85c32", dark: "#7a4222", black: "#0a0a0a" }, // unverified — copper accent, no public digital hex
+  { name: "Cupra", primary: "#a85c32", dark: "#7a4222", black: "#0a0a0a" }, // unverified - copper accent, no public digital hex
   { name: "Deepal", primary: "#0a4dab", dark: "#073876", black: "#0a0a0a" }, // unverified
   { name: "Fiat", primary: "#8b0304", dark: "#5e0203", black: "#0a0a0a" },
   { name: "Ford", primary: "#003478", dark: "#00234f", black: "#0a0a0a" },
@@ -26,7 +26,7 @@ const BRAND_COLOURS = [
   { name: "Hyundai", primary: "#002c5f", dark: "#001c3d", black: "#0a0a0a" },
   { name: "Isuzu UTE", primary: "#e2231a", dark: "#a91a13", black: "#0a0a0a" },
   { name: "Jaecoo", primary: "#a9822f", dark: "#7c5f22", black: "#0a0a0a" }, // unverified
-  { name: "Jaguar", primary: "#1b1b1b", dark: "#000000", black: "#0a0a0a" }, // unverified — 2024 rebrand still settling
+  { name: "Jaguar", primary: "#1b1b1b", dark: "#000000", black: "#0a0a0a" }, // unverified - 2024 rebrand still settling
   { name: "Jeep", primary: "#4a5d23", dark: "#333f18", black: "#0a0a0a" },
   { name: "Kia", primary: "#4a4a4a", dark: "#2b2b2b", black: "#0a0a0a" },
   { name: "Land Rover", primary: "#0b6836", dark: "#073d1f", black: "#0a0a0a" },
