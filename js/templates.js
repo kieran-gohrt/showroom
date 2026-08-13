@@ -743,8 +743,8 @@ function generateHTML(prefix, state) {
 <span id="enquire" class="anchor"></span>
 <section class="content grey-bg">
     <div class="sml-wrapper t-center">
-        <h2 class="h1">${escapeHtml(state.formHeading)}</h2>
-        ${state.formShortcode}
+        <h2 class="h1">${escapeHtml(state.formHeading || "Enquire Now")}</h2>
+        ${state.formShortcode || '<!-- PASTE YOUR FORM SHORTCODE HERE, e.g. [ate-form title="Contact Form"] — create the form in WordPress first, then paste its shortcode in place of this comment -->'}
     </div>
 </section>`
     : "";
