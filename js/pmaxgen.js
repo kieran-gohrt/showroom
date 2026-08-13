@@ -3,25 +3,15 @@
  * anything to "count carefully" — candidates that exceed the limit are
  * simply filtered out before selection, so nothing over-length can ever
  * reach the output.
+ *
+ * Offer type is free text (not a fixed dropdown) — real dealership
+ * campaigns span far more than a handful of categories (EOFY Sale, Plate
+ * Clearance, Run-Out, Stocktake, Christmas In July, Free Servicing, Bonus
+ * Accessories...), so state.offers is an array of 1-2 { type, value }
+ * pairs the user typed themselves, not a lookup against a fixed list.
  */
 
 const PMAX_LIMITS = { headline: 30, longHeadline: 90, description: 90 };
-
-const OFFER_TYPE_NOUN = {
-  cashback: "Cashback",
-  finance: "Finance",
-  clearance: "Clearance",
-  bonus: "Bonus Offer",
-  general: "",
-};
-
-const OFFER_TYPE_PHRASE = {
-  cashback: "cashback offer",
-  finance: "finance rate",
-  clearance: "clearance event",
-  bonus: "bonus offer",
-  general: "offer",
-};
 
 const SCOPE_LABEL = {
   all: "",
@@ -102,23 +92,26 @@ function pickWithinLimit(candidates, fallbackPool, limit, count) {
 }
 
 function buildHeadlines(s) {
-  const noun = OFFER_TYPE_NOUN[s.offerType];
   const scope = SCOPE_LABEL[s.scope];
   const model = s.models[0] || "";
   const c = [];
 
-  if (s.offerValue && noun) c.push(`${s.offerValue} ${noun}`);
-  if (s.offerValue && model) c.push(`${model} ${s.offerValue} Off`);
-  if (model && noun) c.push(`${model} ${noun}`);
-  if (scope && noun) c.push(`${scope} ${noun}`);
-  if (s.offerValue && scope) c.push(`${s.offerValue} On ${scope}`);
-  if (s.driveAway && s.offerValue) c.push(`Drive Away ${s.offerValue}`);
-  if (s.dealer && noun) c.push(`${s.dealer} ${noun}`);
+  s.offers.forEach((o) => {
+    if (o.value && o.type) c.push(`${o.value} ${o.type}`);
+    if (o.value && model) c.push(`${model} ${o.value} Off`);
+    if (model && o.type) c.push(`${model} ${o.type}`);
+    if (scope && o.type) c.push(`${scope} ${o.type}`);
+    if (o.value && scope) c.push(`${o.value} On ${scope}`);
+    if (s.driveAway && o.value) c.push(`Drive Away ${o.value}`);
+    if (s.dealer && o.type) c.push(`${s.dealer} ${o.type}`);
+    if (o.value) c.push(`Save ${o.value} Today`);
+    if (o.type) c.push(`${o.type} Event`);
+    if (o.type) c.push(`${o.type} Now On`);
+  });
+
   if (model) c.push(`${model} In Stock Now`);
   if (model && scope) c.push(`${scope} ${model} Now`);
   if (s.endDate) c.push(`Ends ${s.endDate}`);
-  if (s.offerValue) c.push(`Save ${s.offerValue} Today`);
-  if (noun) c.push(`${noun} Event`);
   if (model) c.push(`${model} Special Offer`);
   if (s.dealer) c.push(`${s.dealer} Event`);
   if (s.dealer && scope) c.push(`${scope} At ${s.dealer}`);
@@ -128,35 +121,47 @@ function buildHeadlines(s) {
 }
 
 function buildLongHeadlines(s) {
-  const noun = OFFER_TYPE_PHRASE[s.offerType];
   const scopeLower = SCOPE_PHRASE[s.scope];
   const scope = SCOPE_LABEL[s.scope];
   const model = s.models[0] || "";
   const urgencies = URGENCY_PHRASE[s.urgency];
   const c = [];
 
-  if (s.offerValue) c.push(capFirst(`${s.offerValue} ${noun} at ${s.dealer}`));
-  if (s.offerValue) c.push(capFirst(`${s.offerValue} ${noun} on ${scopeLower} at ${s.dealer}`));
-  if (model) c.push(capFirst(`${scope} ${model} available now at ${s.dealer}`.replace(/^ /, "")));
-  if (s.offerValue) c.push(capFirst(`Drive away today with ${s.offerValue} ${noun} at ${s.dealer}`));
-  if (s.offerValue) {
-    c.push(capFirst(`Visit ${s.dealer} today for ${s.offerValue} ${noun} on ${scopeLower}`));
+  s.offers.forEach((o) => {
+    if (o.value && o.type) c.push(capFirst(`${o.value} ${o.type} at ${s.dealer}`));
+    if (o.value && o.type) c.push(capFirst(`${o.value} ${o.type} on ${scopeLower} at ${s.dealer}`));
+    if (o.value && o.type) c.push(capFirst(`Drive away today with ${o.value} ${o.type} at ${s.dealer}`));
+    if (o.value && o.type && s.endDate) c.push(capFirst(`${o.value} ${o.type} ends ${s.endDate} at ${s.dealer}`));
+    if (model && o.value && o.type) c.push(capFirst(`${model} ${o.type}, ${o.value} at ${s.dealer}`));
+    urgencies.forEach((u) => {
+      if (o.value && o.type) c.push(capFirst(`${o.value} ${o.type} at ${s.dealer}, ${u}`));
+    });
+  });
+
+  if (s.offers.length === 2) {
+    const [a, b] = s.offers;
+    if (a.value && a.type && b.value && b.type) {
+      c.push(capFirst(`${a.value} ${a.type} or ${b.value} ${b.type} at ${s.dealer}`));
+      c.push(capFirst(`Choose ${a.value} ${a.type} or ${b.value} ${b.type} at ${s.dealer}`));
+    } else if (a.type && b.type) {
+      c.push(capFirst(`Choose ${a.type} or ${b.type} at ${s.dealer} today`));
+    }
+  }
+
+  const leadOffer = s.offers.find((o) => o.value && o.type);
+  if (leadOffer) {
+    c.push(capFirst(`Visit ${s.dealer} today for ${leadOffer.value} ${leadOffer.type} on ${scopeLower}`));
   } else {
     c.push(capFirst(`Visit ${s.dealer} today to explore ${scopeLower}`));
   }
+  if (model) c.push(capFirst(`${scope} ${model} available now at ${s.dealer}`.replace(/^ /, "")));
   if (model) c.push(capFirst(`Explore the ${model} range at ${s.dealer} today`));
   c.push(capFirst(`Book a test drive at ${s.dealer} and save today`));
-  if (s.endDate && s.offerValue) c.push(capFirst(`${s.offerValue} ${noun} ends ${s.endDate} at ${s.dealer}`));
-  urgencies.forEach((u) => {
-    if (s.offerValue) c.push(capFirst(`${s.offerValue} ${noun} at ${s.dealer}, ${u}`));
-  });
-  if (model && s.offerValue) c.push(capFirst(`${model} ${noun}, ${s.offerValue} at ${s.dealer}`));
 
   return pickWithinLimit(c, FALLBACK_LONG_HEADLINES, PMAX_LIMITS.longHeadline, 5);
 }
 
 function buildDescriptions(s) {
-  const noun = OFFER_TYPE_PHRASE[s.offerType];
   const scopeLower = SCOPE_PHRASE[s.scope];
   const scope = SCOPE_LABEL[s.scope];
   const model = s.models[0] || "";
@@ -164,15 +169,27 @@ function buildDescriptions(s) {
   const tcsSuffix = s.tcsApply ? " T&Cs apply." : "";
   const c = [];
 
-  if (s.offerValue) c.push(capFirst(`Save ${s.offerValue} on ${scopeLower} at ${s.dealer}.`));
-  if (model && s.offerValue) c.push(capFirst(`Explore the ${model} with ${s.offerValue} ${noun} at ${s.dealer}.`));
+  s.offers.forEach((o) => {
+    if (o.value) c.push(capFirst(`Save ${o.value} on ${scopeLower} at ${s.dealer}.`));
+    if (model && o.value && o.type) c.push(capFirst(`Explore the ${model} with ${o.value} ${o.type} at ${s.dealer}.`));
+    urgencies.forEach((u) => {
+      if (o.value && o.type) c.push(capFirst(`${o.value} ${o.type} on ${scopeLower}, ${u}.`));
+    });
+  });
+
+  if (s.offers.length === 2) {
+    const [a, b] = s.offers;
+    if (a.value && a.type && b.value && b.type) {
+      c.push(capFirst(`Choose ${a.value} ${a.type} or ${b.value} ${b.type} at ${s.dealer}.`));
+    } else if (a.type && b.type) {
+      c.push(capFirst(`Choose ${a.type} or ${b.type} at ${s.dealer} today.`));
+    }
+  }
+
   c.push(capFirst(`Visit ${s.dealer} today and enquire about ${scopeLower}.`));
   if (scope) c.push(capFirst(`${scope} available now at ${s.dealer}. Enquire today.`));
   if (model) c.push(capFirst(`Drive away today in a ${model} at ${s.dealer}.`));
   c.push(capFirst(`Book your test drive at ${s.dealer} before this offer ends.`));
-  urgencies.forEach((u) => {
-    if (s.offerValue) c.push(capFirst(`${s.offerValue} ${noun} on ${scopeLower}, ${u}.`));
-  });
   if (s.endDate) c.push(capFirst(`Offer ends ${s.endDate}. Enquire at ${s.dealer} today.`));
 
   const withTcs = c.map((line) => {

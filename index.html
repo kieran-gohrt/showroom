@@ -305,17 +305,20 @@
                     <input type="text" id="pmaxModels" placeholder="e.g. Tucson, Santa Fe">
                 </label>
                 <label>Offer type
-                    <select id="pmaxOfferType">
-                        <option value="cashback">Cashback</option>
-                        <option value="finance">Finance rate</option>
-                        <option value="clearance">Clearance / plate clearance</option>
-                        <option value="bonus">Bonus / free extra</option>
-                        <option value="general">General range / event</option>
-                    </select>
+                    <input type="text" id="pmaxOfferType" placeholder="e.g. Cashback, EOFY Sale, Plate Clearance, Free Servicing">
                 </label>
-                <label>Offer value
+                <label>Offer value - optional
                     <input type="text" id="pmaxOfferValue" placeholder="e.g. $2,000 or 3.9% or $99/week">
                 </label>
+                <label class="checkbox"><input type="checkbox" id="pmaxSecondOffer" data-toggle="pmaxSecondOfferFields"> Choice of a second offer</label>
+                <div class="dep-fields" id="pmaxSecondOfferFields">
+                    <label>Second offer type
+                        <input type="text" id="pmaxOfferType2" placeholder="e.g. Low Rate Finance">
+                    </label>
+                    <label>Second offer value - optional
+                        <input type="text" id="pmaxOfferValue2" placeholder="e.g. 3.9%">
+                    </label>
+                </div>
                 <label>Scope
                     <select id="pmaxScope">
                         <option value="all">All stock</option>

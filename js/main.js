@@ -491,11 +491,19 @@ const pmaxPreviewPlaceholder = document.getElementById("pmaxPreviewPlaceholder")
 const pmaxPreviewContent = document.getElementById("pmaxPreviewContent");
 
 function collectPmaxState() {
+  const offers = [];
+  const type1 = val("pmaxOfferType").trim();
+  const value1 = val("pmaxOfferValue").trim();
+  if (type1 || value1) offers.push({ type: type1, value: value1 });
+  if (checked("pmaxSecondOffer")) {
+    const type2 = val("pmaxOfferType2").trim();
+    const value2 = val("pmaxOfferValue2").trim();
+    if (type2 || value2) offers.push({ type: type2, value: value2 });
+  }
   return {
     dealer: val("pmaxDealer") || "the dealership",
     models: val("pmaxModels").split(",").map((m) => m.trim()).filter(Boolean),
-    offerType: val("pmaxOfferType"),
-    offerValue: val("pmaxOfferValue").trim(),
+    offers,
     scope: val("pmaxScope"),
     urgency: val("pmaxUrgency"),
     endDate: val("pmaxEndDate").trim(),
