@@ -26,16 +26,24 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-// Real production syntax confirmed live on an AdTorque Edge site:
-// data-query="condition=New,Demo&make[Isuzu]=D-MAX"
-function buildStockQuery(conditions, brand, models) {
-  const parts = [];
-  if (conditions && conditions.length) {
-    parts.push(`condition=${conditions.join(",")}`);
-  }
+// Real production syntax confirmed live on AdTorque Edge sites:
+// data-query="condition=New,Demo&make[Isuzu]=D-MAX"                  (filter by condition/model)
+// data-query="make[Isuzu]=&keywords=31027237,31421545,31421614"      (manual stock number list)
+function buildStockQuery(row, brand) {
   const brandKey = brand || "";
-  if (models && models.length) {
-    parts.push(`make[${brandKey}]=${models.join(",")}`);
+  if (row.mode === "manual") {
+    const parts = [`make[${brandKey}]=`];
+    if (row.stockNumbers && row.stockNumbers.length) {
+      parts.push(`keywords=${row.stockNumbers.join(",")}`);
+    }
+    return parts.join("&");
+  }
+  const parts = [];
+  if (row.conditions && row.conditions.length) {
+    parts.push(`condition=${row.conditions.join(",")}`);
+  }
+  if (row.models && row.models.length) {
+    parts.push(`make[${brandKey}]=${row.models.join(",")}`);
   } else if (brandKey) {
     parts.push(`make[${brandKey}]=`);
   }
@@ -585,7 +593,7 @@ function generateHTML(prefix, state) {
   const stockRowsHtml = state.stockEnabled
     ? state.stockRows
         .map((row, i) => {
-          const query = buildStockQuery(row.conditions, state.brandName, row.models);
+          const query = buildStockQuery(row, state.brandName);
           return `
         <div class="${prefix}-stock-section">
             <h3>${escapeHtml(row.heading)}</h3>

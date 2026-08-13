@@ -97,7 +97,11 @@ function renumberStockRows() {
   addStockBtn.disabled = rows.length >= STOCK_MAX;
 }
 
+let stockRowCounter = 0;
+
 function buildStockRow() {
+  stockRowCounter++;
+  const groupName = `stock-mode-${stockRowCounter}`;
   const row = document.createElement("div");
   row.className = "stock-row";
   row.innerHTML = `
@@ -107,10 +111,17 @@ function buildStockRow() {
     </div>
     <label>Section heading <input type="text" class="stock-heading" placeholder="e.g. New Arrivals"></label>
     <label>Intro text <input type="text" class="stock-intro" placeholder="e.g. Explore our latest new arrivals."></label>
-    <label class="checkbox"><input type="checkbox" class="stock-cond" value="New" checked> New</label>
-    <label class="checkbox"><input type="checkbox" class="stock-cond" value="Demo"> Demo</label>
-    <label class="checkbox"><input type="checkbox" class="stock-cond" value="Used"> Used</label>
-    <label>Models (comma-separated, matching the dealer site's exact model names) <input type="text" class="stock-models" placeholder="e.g. Tucson, Kona"></label>
+    <label class="radio"><input type="radio" name="${groupName}" class="stock-mode" value="filter" checked> Filter by condition &amp; model</label>
+    <label class="radio"><input type="radio" name="${groupName}" class="stock-mode" value="manual"> Manual stock numbers</label>
+    <div class="stock-filter-fields">
+        <label class="checkbox"><input type="checkbox" class="stock-cond" value="New" checked> New</label>
+        <label class="checkbox"><input type="checkbox" class="stock-cond" value="Demo"> Demo</label>
+        <label class="checkbox"><input type="checkbox" class="stock-cond" value="Used"> Used</label>
+        <label>Models (comma-separated, matching the dealer site's exact model names) <input type="text" class="stock-models" placeholder="e.g. Tucson, Kona"></label>
+    </div>
+    <div class="stock-manual-fields" hidden>
+        <label>Stock numbers (comma-separated) <input type="text" class="stock-numbers" placeholder="e.g. 31027237, 31421545, 31421614"></label>
+    </div>
     <label>Card limit <input type="number" class="stock-limit" value="12" min="1" max="24"></label>
   `;
   stockRowsWrap.appendChild(row);
@@ -119,6 +130,16 @@ function buildStockRow() {
     row.remove();
     renumberStockRows();
     scheduleUpdate();
+  });
+  const filterFields = row.querySelector(".stock-filter-fields");
+  const manualFields = row.querySelector(".stock-manual-fields");
+  row.querySelectorAll(".stock-mode").forEach((radio) => {
+    radio.addEventListener("change", () => {
+      const isManual = row.querySelector(".stock-mode:checked").value === "manual";
+      filterFields.hidden = isManual;
+      manualFields.hidden = !isManual;
+      scheduleUpdate();
+    });
   });
   wireLiveInputs(row);
   renumberStockRows();
@@ -159,17 +180,26 @@ function collectOffers() {
 }
 
 function collectStockRows() {
-  return [...stockRowsWrap.querySelectorAll(".stock-row")].map((row) => ({
-    heading: row.querySelector(".stock-heading").value,
-    intro: row.querySelector(".stock-intro").value,
-    conditions: [...row.querySelectorAll(".stock-cond:checked")].map((c) => c.value),
-    models: row
-      .querySelector(".stock-models")
-      .value.split(",")
-      .map((m) => m.trim())
-      .filter(Boolean),
-    limit: row.querySelector(".stock-limit").value || "12",
-  }));
+  return [...stockRowsWrap.querySelectorAll(".stock-row")].map((row) => {
+    const mode = row.querySelector(".stock-mode:checked").value;
+    return {
+      heading: row.querySelector(".stock-heading").value,
+      intro: row.querySelector(".stock-intro").value,
+      mode,
+      conditions: [...row.querySelectorAll(".stock-cond:checked")].map((c) => c.value),
+      models: row
+        .querySelector(".stock-models")
+        .value.split(",")
+        .map((m) => m.trim())
+        .filter(Boolean),
+      stockNumbers: row
+        .querySelector(".stock-numbers")
+        .value.split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      limit: row.querySelector(".stock-limit").value || "12",
+    };
+  });
 }
 
 function val(id) {
