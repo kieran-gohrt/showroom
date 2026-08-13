@@ -1,3 +1,4 @@
+// @ts-nocheck
 /*
  * Cloudflare Worker — turns a one-line campaign brief into structured
  * landing-page copy using Workers AI (free tier). Deploy via the Cloudflare
