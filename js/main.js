@@ -44,22 +44,15 @@ function applyBrandColours() {
 }
 brandSelect.addEventListener("change", applyBrandColours);
 
-// ---------- Offers (dynamic add/remove, 3-6) ----------
+// ---------- Offers (dynamic add/remove, 0-6, added one at a time) ----------
 const offersList = document.getElementById("offersList");
 const addOfferBtn = document.getElementById("addOfferBtn");
-const OFFER_MIN = 3;
 const OFFER_MAX = 6;
-const defaultOffers = [
-  ["Drive Away Pricing", "No hidden extras, just one straightforward price."],
-  ["Low Rate Finance", "Speak to our team about finance options tailored to you."],
-  ["Extended Warranty", "Extra peace of mind on every new vehicle we sell."],
-];
 
 function renumberOffers() {
   const rows = offersList.querySelectorAll(".offer-row");
   rows.forEach((row, i) => {
     row.querySelector(".offer-row-head span").textContent = `Offer ${i + 1}`;
-    row.querySelector(".remove-btn").disabled = rows.length <= OFFER_MIN;
   });
   addOfferBtn.disabled = rows.length >= OFFER_MAX;
 }
@@ -72,12 +65,11 @@ function addOfferRow(title = "", desc = "") {
       <span>Offer</span>
       <button type="button" class="remove-btn">Remove</button>
     </div>
-    <label>Title <input type="text" class="offer-title" value="${title}"></label>
-    <label>Description <textarea class="offer-desc">${desc}</textarea></label>
+    <label>Title <input type="text" class="offer-title" value="${title}" placeholder="e.g. Drive Away Pricing"></label>
+    <label>Description <textarea class="offer-desc" placeholder="e.g. No hidden extras, just one straightforward price.">${desc}</textarea></label>
   `;
   offersList.appendChild(row);
   row.querySelector(".remove-btn").addEventListener("click", () => {
-    if (offersList.querySelectorAll(".offer-row").length <= OFFER_MIN) return;
     row.remove();
     renumberOffers();
     scheduleUpdate();
@@ -85,39 +77,36 @@ function addOfferRow(title = "", desc = "") {
   wireLiveInputs(row);
   renumberOffers();
 }
-defaultOffers.forEach(([t, d]) => addOfferRow(t, d));
 addOfferBtn.addEventListener("click", () => {
   if (offersList.querySelectorAll(".offer-row").length >= OFFER_MAX) return;
-  addOfferRow("New Offer", "Describe the offer here.");
+  addOfferRow();
   scheduleUpdate();
 });
 
 // ---------- Stock rows ----------
 const stockRowsWrap = document.getElementById("stockRows");
-function buildStockRow(index, defaults) {
+function buildStockRow(index) {
   const row = document.createElement("div");
   row.className = "stock-row";
   row.dataset.row = index;
   row.innerHTML = `
-    <label>Section heading <input type="text" class="stock-heading" value="${defaults.heading}"></label>
-    <label>Intro text <input type="text" class="stock-intro" value="${defaults.intro}"></label>
+    <label>Section heading <input type="text" class="stock-heading" placeholder="e.g. New Arrivals"></label>
+    <label>Intro text <input type="text" class="stock-intro" placeholder="e.g. Explore our latest new arrivals."></label>
     <label class="checkbox"><input type="checkbox" class="stock-cond" value="New" checked> New</label>
     <label class="checkbox"><input type="checkbox" class="stock-cond" value="Demo"> Demo</label>
     <label class="checkbox"><input type="checkbox" class="stock-cond" value="Used"> Used</label>
-    <label>Models (comma-separated, matching the dealer site's exact model names) <input type="text" class="stock-models" value="${defaults.models}"></label>
+    <label>Models (comma-separated, matching the dealer site's exact model names) <input type="text" class="stock-models" placeholder="e.g. Tucson, Kona"></label>
     <label>Card limit <input type="number" class="stock-limit" value="12" min="1" max="24"></label>
   `;
   return row;
 }
-stockRowsWrap.appendChild(
-  buildStockRow(1, { heading: "New Arrivals", intro: "Explore our latest new arrivals.", models: "" })
-);
+stockRowsWrap.appendChild(buildStockRow(1));
 
 const stockRow2Checkbox = document.getElementById("stockRow2Enabled");
 let stockRow2El = null;
 stockRow2Checkbox.addEventListener("change", () => {
   if (stockRow2Checkbox.checked && !stockRow2El) {
-    stockRow2El = buildStockRow(2, { heading: "Demo Clearance", intro: "Drive away today in a demo vehicle.", models: "" });
+    stockRow2El = buildStockRow(2);
     stockRowsWrap.appendChild(stockRow2El);
     wireLiveInputs(stockRow2El);
   } else if (!stockRow2Checkbox.checked && stockRow2El) {
@@ -126,6 +115,24 @@ stockRow2Checkbox.addEventListener("change", () => {
   }
   scheduleUpdate();
 });
+
+// ---------- CTA link type (external URL / first stock section / contact form) ----------
+function wireCtaLinkType(typeId, urlFieldWrapId) {
+  const select = document.getElementById(typeId);
+  const wrap = document.getElementById(urlFieldWrapId);
+  const sync = () => { wrap.hidden = select.value !== "url"; };
+  sync();
+  select.addEventListener("change", () => { sync(); scheduleUpdate(); });
+}
+wireCtaLinkType("ctaPrimaryType", "ctaPrimaryUrlField");
+wireCtaLinkType("ctaSecondaryType", "ctaSecondaryUrlField");
+
+function resolveCtaHref(typeId, urlFieldId, prefix) {
+  const type = val(typeId);
+  if (type === "stock") return `#${prefix}-stock-1`;
+  if (type === "enquire") return "#enquire";
+  return val(urlFieldId);
+}
 
 // ---------- Collect state ----------
 function collectOffers() {
@@ -157,15 +164,16 @@ function checked(id) {
 }
 
 function collectLandingState() {
+  const brandName = val("brandName") || val("dealershipName") || "Custom";
+  const prefix = slugify(brandName);
   return {
-    brandName: val("brandName") || val("dealershipName") || "Custom",
+    brandName,
     colours: {
       primary: val("colourPrimary"),
       dark: val("colourDark"),
       black: val("colourBlack"),
     },
     style: document.querySelector('input[name="style"]:checked').value,
-    eventPill: val("eventPill"),
     urgencyEnabled: checked("urgencyEnabled"),
     urgencyText: val("urgencyText"),
     heroBrandLine: val("heroBrandLine"),
@@ -175,10 +183,11 @@ function collectLandingState() {
     dateBannerEnabled: checked("dateBannerEnabled"),
     dateBannerText: val("dateBannerText"),
     ctaPrimaryText: val("ctaPrimaryText"),
-    ctaPrimaryHref: val("ctaPrimaryHref"),
+    ctaPrimaryHref: resolveCtaHref("ctaPrimaryType", "ctaPrimaryHref", prefix),
     ctaSecondaryEnabled: checked("ctaSecondaryEnabled"),
     ctaSecondaryText: val("ctaSecondaryText"),
-    ctaSecondaryHref: val("ctaSecondaryHref"),
+    ctaSecondaryHref: resolveCtaHref("ctaSecondaryType", "ctaSecondaryHref", prefix),
+    offersEnabled: checked("offersEnabled"),
     offerHeading: val("offerHeading"),
     offerIntro: val("offerIntro"),
     offers: collectOffers(),

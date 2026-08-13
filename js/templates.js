@@ -138,23 +138,6 @@ function generateCSS(prefix, colours, style) {
         z-index: 2;
     }
 
-    .${prefix}-event-pill {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 12px 22px;
-        margin: 0 auto 28px;
-        border-radius: 999px;
-        background: var(--${prefix}-primary);
-        color: #fff;
-        font-size: 15px;
-        font-weight: 900;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        border: 1px solid rgba(255,255,255,0.18);
-        box-shadow: 0 0 34px ${hexToRgba(colours.primary, 0.32)};
-    }
-
     .${prefix}-urgency-badge {
         display: inline-flex;
         align-items: center;
@@ -584,10 +567,19 @@ function generateHTML(prefix, state) {
     ? `<a href="${escapeHtml(state.ctaSecondaryHref)}" class="${prefix}-btn ${prefix}-btn-secondary">${escapeHtml(state.ctaSecondaryText)}</a>`
     : "";
 
+  const offerPanelHtml = state.offersEnabled
+    ? `
+        <div class="${prefix}-offer-panel">
+            <h3>${escapeHtml(state.offerHeading)}</h3>
+            <p class="${prefix}-offer-intro">${escapeHtml(state.offerIntro)}</p>
+            <div class="${prefix}-offer-grid">${offerCards}
+            </div>${financeHtml}
+        </div>`
+    : "";
+
   return `<section class="${prefix}-page">
     <div class="${prefix}-wrapper">
 
-        <div class="${prefix}-event-pill">${escapeHtml(state.eventPill)}</div>
         ${urgencyHtml}
 
         <div class="${prefix}-hero">
@@ -604,13 +596,7 @@ function generateHTML(prefix, state) {
                 ${secondaryCtaHtml}
             </div>
         </div>
-
-        <div class="${prefix}-offer-panel">
-            <h3>${escapeHtml(state.offerHeading)}</h3>
-            <p class="${prefix}-offer-intro">${escapeHtml(state.offerIntro)}</p>
-            <div class="${prefix}-offer-grid">${offerCards}
-            </div>${financeHtml}
-        </div>
+        ${offerPanelHtml}
         ${stockRowsHtml}
         ${endingHtml}
         ${tcsHtml}

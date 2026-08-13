@@ -58,31 +58,28 @@
         <details class="section">
             <summary>Hero</summary>
             <div class="section-body">
-                <label>Event pill text
-                    <input type="text" id="eventPill" value="EOFY Sale Now On">
-                </label>
                 <label class="checkbox"><input type="checkbox" id="urgencyEnabled" data-toggle="urgencyFields"> Urgency badge</label>
                 <div class="dep-fields" id="urgencyFields">
                     <label>Urgency badge text
-                        <input type="text" id="urgencyText" value="5 Days Left">
+                        <input type="text" id="urgencyText" placeholder="e.g. 5 Days Left">
                     </label>
                 </div>
                 <label>Brand line (small text above heading)
-                    <input type="text" id="heroBrandLine" value="End of Financial Year">
+                    <input type="text" id="heroBrandLine" placeholder="e.g. End of Financial Year">
                 </label>
                 <label>Heading
-                    <input type="text" id="heading" value="Massive Savings">
+                    <input type="text" id="heading" placeholder="e.g. Massive Savings">
                 </label>
                 <label>Subheading
-                    <input type="text" id="subheading" value="On Now">
+                    <input type="text" id="subheading" placeholder="e.g. On Now">
                 </label>
                 <label>Paragraph
-                    <textarea id="paragraph">Don't miss your chance to save big before EOFY ends.</textarea>
+                    <textarea id="paragraph" placeholder="e.g. Don't miss your chance to save big before EOFY ends."></textarea>
                 </label>
                 <label class="checkbox"><input type="checkbox" id="dateBannerEnabled" checked data-toggle="dateBannerFields"> Date banner</label>
                 <div class="dep-fields" id="dateBannerFields">
                     <label>Date banner text
-                        <input type="text" id="dateBannerText" value="Ends 30 June">
+                        <input type="text" id="dateBannerText" placeholder="e.g. Ends 30 June">
                     </label>
                 </div>
             </div>
@@ -92,19 +89,37 @@
             <summary>Call to action</summary>
             <div class="section-body">
                 <label>Primary button text
-                    <input type="text" id="ctaPrimaryText" value="Enquire Now">
+                    <input type="text" id="ctaPrimaryText" placeholder="e.g. Enquire Now">
                 </label>
-                <label>Primary button link
-                    <input type="text" id="ctaPrimaryHref" value="#enquire">
+                <label>Primary button links to
+                    <select id="ctaPrimaryType">
+                        <option value="url">External URL</option>
+                        <option value="stock">First stock section</option>
+                        <option value="enquire">Contact form</option>
+                    </select>
                 </label>
+                <div class="dep-fields" id="ctaPrimaryUrlField">
+                    <label>URL
+                        <input type="text" id="ctaPrimaryHref" placeholder="https://... or /stock">
+                    </label>
+                </div>
                 <label class="checkbox"><input type="checkbox" id="ctaSecondaryEnabled" data-toggle="ctaSecondaryFields"> Secondary button</label>
                 <div class="dep-fields" id="ctaSecondaryFields">
                     <label>Secondary button text
-                        <input type="text" id="ctaSecondaryText" value="Browse Stock">
+                        <input type="text" id="ctaSecondaryText" placeholder="e.g. Browse Stock">
                     </label>
-                    <label>Secondary button link
-                        <input type="text" id="ctaSecondaryHref" value="/stock">
+                    <label>Secondary button links to
+                        <select id="ctaSecondaryType">
+                            <option value="url">External URL</option>
+                            <option value="stock">First stock section</option>
+                            <option value="enquire">Contact form</option>
+                        </select>
                     </label>
+                    <div class="dep-fields" id="ctaSecondaryUrlField">
+                        <label>URL
+                            <input type="text" id="ctaSecondaryHref" placeholder="https://... or /stock">
+                        </label>
+                    </div>
                 </div>
             </div>
         </details>
@@ -112,23 +127,26 @@
         <details class="section">
             <summary>Offers</summary>
             <div class="section-body">
-                <label>Panel heading
-                    <input type="text" id="offerHeading" value="Why Buy Now">
-                </label>
-                <label>Panel intro
-                    <textarea id="offerIntro">Take advantage of these limited-time offers before they're gone.</textarea>
-                </label>
-                <div id="offersList"></div>
-                <button type="button" id="addOfferBtn" class="add-btn">+ Add offer</button>
-                <p class="hint">3–6 offer cards.</p>
-                <label class="checkbox"><input type="checkbox" id="financeEnabled" data-toggle="financeFields"> Finance teaser box</label>
-                <div class="dep-fields" id="financeFields">
-                    <label>Finance headline
-                        <input type="text" id="financeHeadline" value="From $99/week">
+                <label class="checkbox"><input type="checkbox" id="offersEnabled" data-toggle="offersFields"> Include offers panel</label>
+                <div class="dep-fields" id="offersFields">
+                    <label>Panel heading
+                        <input type="text" id="offerHeading" placeholder="e.g. Why Buy Now">
                     </label>
-                    <label>Finance text
-                        <input type="text" id="financeText" value="Speak to our finance team for a tailored quote.">
+                    <label>Panel intro
+                        <textarea id="offerIntro" placeholder="e.g. Take advantage of these limited-time offers before they're gone."></textarea>
                     </label>
+                    <div id="offersList"></div>
+                    <button type="button" id="addOfferBtn" class="add-btn">+ Add offer</button>
+                    <p class="hint">Up to 6 offer cards.</p>
+                    <label class="checkbox"><input type="checkbox" id="financeEnabled" data-toggle="financeFields"> Finance teaser box</label>
+                    <div class="dep-fields" id="financeFields">
+                        <label>Finance headline
+                            <input type="text" id="financeHeadline" placeholder="e.g. From $99/week">
+                        </label>
+                        <label>Finance text
+                            <input type="text" id="financeText" placeholder="e.g. Speak to our finance team for a tailored quote.">
+                        </label>
+                    </div>
                 </div>
             </div>
         </details>
@@ -150,10 +168,10 @@
                 <label class="checkbox"><input type="checkbox" id="endingEnabled" checked data-toggle="endingFields"> Include closing panel</label>
                 <div class="dep-fields" id="endingFields">
                     <label>Heading
-                        <input type="text" id="endingHeading" value="Don't Miss Out">
+                        <input type="text" id="endingHeading" placeholder="e.g. Don't Miss Out">
                     </label>
                     <label>Text
-                        <textarea id="endingText">Offer ends soon — enquire today to secure your vehicle.</textarea>
+                        <textarea id="endingText" placeholder="e.g. Offer ends soon — enquire today to secure your vehicle."></textarea>
                     </label>
                 </div>
             </div>
@@ -165,12 +183,10 @@
                 <label class="checkbox"><input type="checkbox" id="tcsEnabled" checked data-toggle="tcsFields"> Include T&amp;Cs</label>
                 <div class="dep-fields" id="tcsFields">
                     <label>Heading
-                        <input type="text" id="tcsHeading" value="Terms & Conditions">
+                        <input type="text" id="tcsHeading" placeholder="e.g. Terms &amp; Conditions">
                     </label>
                     <label>Items (one per line)
-                        <textarea id="tcsItems" rows="4">Offer valid while stocks last.
-Excludes fleet and government sales.
-Not available in conjunction with any other offer.</textarea>
+                        <textarea id="tcsItems" rows="4" placeholder="e.g. Offer valid while stocks last."></textarea>
                     </label>
                     <label class="checkbox"><input type="checkbox" id="tcsAccordion"> Show as collapsible accordion</label>
                 </div>
