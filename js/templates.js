@@ -732,6 +732,23 @@ function generateHTML(prefix, state) {
     ? `<a href="${escapeHtml(state.ctaSecondaryHref)}" class="${prefix}-btn ${prefix}-btn-secondary">${escapeHtml(state.ctaSecondaryText)}</a>`
     : "";
 
+  // Matches the AdTorque theme's own contact-form pattern verbatim (confirmed
+  // from a real reference template): a plain anchor + the theme's global
+  // "content grey-bg" / "sml-wrapper t-center" classes wrapping whatever
+  // [ate-form ...] shortcode the user pastes in. Never escape the shortcode
+  // itself — it must render as literal WordPress shortcode text, not HTML
+  // entities, for the theme to parse it.
+  const formHtml = state.formEnabled
+    ? `
+<span id="enquire" class="anchor"></span>
+<section class="content grey-bg">
+    <div class="sml-wrapper t-center">
+        <h2 class="h1">${escapeHtml(state.formHeading)}</h2>
+        ${state.formShortcode}
+    </div>
+</section>`
+    : "";
+
   const offerPanelHtml = state.offersEnabled
     ? `
         <div class="${prefix}-offer-panel">
@@ -761,6 +778,7 @@ function generateHTML(prefix, state) {
                 ${secondaryCtaHtml}
             </div>
         </div>
+        ${formHtml}
         ${offerPanelHtml}
         ${stockRowsHtml}
         ${endingHtml}

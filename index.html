@@ -29,7 +29,7 @@
 
         <div class="ai-brief">
             <label>Describe your campaign
-                <textarea id="aiBrief" rows="3" placeholder="e.g. Melville Hyundai. $2000 cashback offer across new and demo vehicles. Ends August 31st."></textarea>
+                <textarea id="aiBrief" rows="3" placeholder="e.g. Melville Hyundai. $2000 cashback offer across new and demo Tucson, Santa Fe and i30. Ends August 31st."></textarea>
             </label>
             <button type="button" id="aiGenerateBtn" class="ai-btn">✨ Generate with AI</button>
             <p class="hint" id="aiStatus"></p>
@@ -132,6 +132,22 @@
                             <input type="text" id="ctaSecondaryHref" placeholder="https://... or /stock">
                         </label>
                     </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="section">
+            <summary>Contact form</summary>
+            <div class="section-body">
+                <label class="checkbox"><input type="checkbox" id="formEnabled" data-toggle="formFields"> Include contact form section</label>
+                <div class="dep-fields" id="formFields">
+                    <label>Form shortcode
+                        <input type="text" id="formShortcode" placeholder='[ate-form title="Contact Form"]'>
+                    </label>
+                    <p class="hint">Create the form in WordPress first, then paste its shortcode here — it gets dropped straight into the generated code so it actually displays. Any button/link set to "Contact form" jumps to this section.</p>
+                    <label>Section heading
+                        <input type="text" id="formHeading" placeholder="e.g. Enquire Now">
+                    </label>
                 </div>
             </div>
         </details>
